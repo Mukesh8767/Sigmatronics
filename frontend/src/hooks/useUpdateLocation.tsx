@@ -1,5 +1,5 @@
 // hooks/useUpdateLocation.ts
-import axios from "axios";
+
 import axiosInstance from "../../utils/axiosInstance";
 
 export const useUpdateLocation = () => {

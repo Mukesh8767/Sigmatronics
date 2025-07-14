@@ -32,7 +32,7 @@ const MachineAssignmentTable = ({
   onPageChange,
   onRefresh,
 }: MachineAssignmentTableProps) => {
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deletingId] = useState<string | null>(null);
 
   const handleDelete = async (id: string) => {
       await axiosInstance.delete(`/api/device/delete-device/${id}`);

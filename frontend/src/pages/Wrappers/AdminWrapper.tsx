@@ -5,7 +5,7 @@ import {
   LogOut,
   Monitor,
   Users,
-  BarChart2,
+  
   Menu,
   Puzzle
 } from 'lucide-react';

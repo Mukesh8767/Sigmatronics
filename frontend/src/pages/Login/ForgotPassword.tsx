@@ -1,5 +1,4 @@
 import { useState } from "react";
-import axios from "axios";
 import { config } from "../../config/config";
 import EmailStep from "./EmailStep";
 import OtpStep from "./OtpStep";

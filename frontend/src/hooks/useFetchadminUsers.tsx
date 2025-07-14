@@ -1,7 +1,7 @@
 // hooks/useFetchUser.ts
 import React from "react";
 import axiosInstance from "../../utils/axiosInstance";
-import { config } from "../config/config";
+
 
 export const useFetchUser = (page: number, limit: number = 10) => {
   const [userData, setUserData] = React.useState<{
@@ -16,7 +16,7 @@ export const useFetchUser = (page: number, limit: number = 10) => {
   React.useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = localStorage.getItem("accessToken");
+        
 
         const response = await axiosInstance.get(
           `/api/user/getAllUsers?page=${page}&limit=${limit}`,
@@ -55,7 +55,7 @@ export const useAllFetchRootUsers = () => {
   React.useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const token = localStorage.getItem("accessToken");
+        
 
         const response = await axiosInstance.get(
           `/api/user/getAllUsers`
