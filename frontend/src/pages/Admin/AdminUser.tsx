@@ -1,0 +1,161 @@
+import AdminWrapper from "../Wrappers/AdminWrapper";
+import { Button } from "../../components/button";
+import { Plus } from "lucide-react";
+import { useState } from "react";
+import { useFetchUser } from "../../hooks/useFetchadminUsers";
+import axiosInstance from "../../../utils/axiosInstance";
+import { UserTable } from "../../components/tables/UserTable";
+import { UserModal } from "../../components/UserModal";
+import UserDevicePopup from "../../components/UserDevicePopup"; // ✅ import popup
+
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  phoneNumber?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export const AdminUsers = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const { users = [], totalPages = 1, loading, error } = useFetchUser(currentPage, 10);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({ name: "", email: "", phoneNumber: "" });
+  const [formLoading, setFormLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingUserId, setEditingUserId] = useState<string | null>(null);
+
+  const [viewUserId, setViewUserId] = useState<string | null>(null); // ✅ state for device popup
+
+  const filteredUsers = users.filter((user: User) =>
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.phoneNumber?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleDeleteUser = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+    try {
+      await axiosInstance.delete(`/api/user/deleteUser/${id}`);
+      window.location.reload();
+    } catch (err: any) {
+      alert(err.response?.data?.message || "Failed to delete user");
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async () => {
+    if (!formData.name.trim() || !formData.email.trim() || !formData.phoneNumber) {
+      setFormError("Please fill in all fields");
+      return;
+    }
+
+    try {
+      setFormLoading(true);
+      setFormError(null);
+
+      if (isEditMode && editingUserId) {
+        await axiosInstance.put(`/api/user/update/${editingUserId}`, formData);
+        setSuccess("User updated successfully!");
+      } else {
+        await axiosInstance.post(`/api/user/signup`, formData);
+        setSuccess("User invited successfully!");
+      }
+
+      setFormData({ name: "", email: "", phoneNumber: "" });
+
+      setTimeout(() => {
+        setIsModalOpen(false);
+        setIsEditMode(false);
+        setEditingUserId(null);
+        window.location.reload();
+      }, 1500);
+    } catch (err: any) {
+      const msg = err.response?.data?.message || "Failed to submit form.";
+      setFormError(msg);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  return (
+    <AdminWrapper>
+      <div className="p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-semibold">Manage Users</h1>
+            <p className="text-sm text-slate-500">View and manage all of your users here.</p>
+          </div>
+          <Button
+            onClick={() => {
+              setFormData({ name: "", email: "", phoneNumber: "" });
+              setIsEditMode(false);
+              setEditingUserId(null);
+              setIsModalOpen(true);
+            }}
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <Plus className="w-5 h-5" />
+            Add User
+          </Button>
+        </div>
+
+        <UserTable
+          users={filteredUsers}
+          onSearch={setSearchTerm}
+          searchTerm={searchTerm}
+          onView={(id) => setViewUserId(id)} // ✅ trigger device popup
+          onEdit={(user) => {
+            const u = user as User;
+            setFormData({
+              name: u.name,
+              email: u.email,
+              phoneNumber: u.phoneNumber ?? "",
+            });
+            setIsEditMode(true);
+            setEditingUserId(u._id);
+            setIsModalOpen(true);
+          }}
+          onDelete={handleDeleteUser}
+          loading={loading}
+          error={error}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
+      </div>
+
+      <UserModal
+        key={editingUserId || "new"}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setIsEditMode(false);
+          setEditingUserId(null);
+        }}
+        onChange={handleInputChange}
+        onSubmit={handleSubmit}
+        formData={formData}
+        loading={formLoading}
+        error={formError}
+        success={success}
+        isEditMode={isEditMode}
+      />
+
+      {/* ✅ Device Popup */}
+      {viewUserId && (
+        <UserDevicePopup isOpen={!!viewUserId} userId={viewUserId} onClose={() => setViewUserId(null)} />
+      )}
+    </AdminWrapper>
+  );
+};
