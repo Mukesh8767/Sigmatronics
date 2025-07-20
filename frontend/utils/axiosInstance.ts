@@ -9,7 +9,7 @@ axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('accessToken');
     if (token) {
-      config.headers.Authorization = `${token}`;
+      config.headers.Authorization = ${token};
     }
     return config;
   },
@@ -39,7 +39,7 @@ axiosInstance.interceptors.response.use(
         const newAccessToken = refresh.data.accessToken;
 
         localStorage.setItem('accessToken', newAccessToken);
-        originalRequest.headers.Authorization = `${newAccessToken}`;
+        originalRequest.headers.Authorization = ${newAccessToken};
 
         return axiosInstance(originalRequest);
       } catch (refreshError) {
