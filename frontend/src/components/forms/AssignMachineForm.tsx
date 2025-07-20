@@ -5,7 +5,7 @@ import Input from '../input';
 import { useAllFetchRootUsers } from '../../hooks/useFetchadminUsers';
 import { useSolutions } from '../../hooks/useFetchSolutions';
 import axios from 'axios';
-import { config } from '../../config/config';
+import axiosInstance from '../../../utils/axiosInstance';
 
 export interface DeviceAssignmentFormProps {
   users: any[];
@@ -90,7 +90,7 @@ const DeviceAssignmentForm: React.FC<DeviceAssignmentFormProps> = ({ onClose, on
     };
 
     try {
-      const response = await axios.post(`${config.BACKEND_URL}/api/device/create-multiple`, payload);
+      const response = await axiosInstance.post(`/api/device/create-multiple`, payload);
 
       if (response.status >= 200 && response.status < 300) {
         setFormData({
