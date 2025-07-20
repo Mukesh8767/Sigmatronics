@@ -9,28 +9,20 @@ import ChartCard from '../../components/ChartCard';
 import TopListCard from '../../components/TopListCard';
 import { useAllFetchRootUsers } from '../../hooks/useFetchadminUsers';
 import { useAllFetchDevices } from '../../hooks/useFetchAdminDevices';
-import axios from 'axios';
-import { config } from '../../config/config';
+import axiosInstance from '../../../utils/axiosInstance';
+
 
 const AdminDashboard: React.FC = () => {
     const { users, loading: userLoading } = useAllFetchRootUsers();
     const { devices, loading: deviceLoading } = useAllFetchDevices();
-    const token = localStorage.getItem('accessToken')
+   
     const [greetingName, setGreetingName] = useState('');
     
     useEffect(() => {
     const fetchName = async () => {
         try {
-            const response = await axios.get(
-                `${config.BACKEND_URL}/api/user/getUser`,
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `${token}`,
-                    },
-                    withCredentials: true,
-                }
-            );
+            const response = await axiosInstance.get('/api/user/getUser');
+            
             setGreetingName(response.data.user.name || 'Admin');
         } catch (err) {
             console.error("Failed to fetch greeting name", err);
