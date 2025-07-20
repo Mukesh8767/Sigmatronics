@@ -4,7 +4,7 @@ import { Button } from '../button';
 import Input from '../input';
 import { useAllFetchRootUsers } from '../../hooks/useFetchadminUsers';
 import { useSolutions } from '../../hooks/useFetchSolutions';
-import axios from 'axios';
+
 import axiosInstance from '../../../utils/axiosInstance';
 
 export interface DeviceAssignmentFormProps {
