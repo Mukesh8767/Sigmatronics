@@ -10,18 +10,18 @@ import TopListCard from '../../components/TopListCard';
 import { useAllFetchRootUsers } from '../../hooks/useFetchadminUsers';
 import { useAllFetchDevices } from '../../hooks/useFetchAdminDevices';
 import axiosInstance from '../../../utils/axiosInstance';
-
+import { useParams } from 'react-router-dom';
 
 const AdminDashboard: React.FC = () => {
     const { users, loading: userLoading } = useAllFetchRootUsers();
     const { devices, loading: deviceLoading } = useAllFetchDevices();
-   
+   const { adminId } = useParams();
     const [greetingName, setGreetingName] = useState('');
     
     useEffect(() => {
     const fetchName = async () => {
         try {
-            const response = await axiosInstance.get('/api/user/getUser');
+            const response = await axiosInstance.get(`/api/user/getUser/${adminId}`);
             
             setGreetingName(response.data.user.name || 'Admin');
         } catch (err) {
