@@ -2,10 +2,8 @@ import { useState, useEffect } from 'react';
 import {
   Home,
   Monitor,
-  Users,
   ChartColumnBig,
   ShieldAlert,
-  Settings,
   LogOut,
   ChevronRight,
   ChevronLeft,
