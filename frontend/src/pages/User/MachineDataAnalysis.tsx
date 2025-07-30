@@ -20,7 +20,6 @@ export const MachineDataAnalysis = () => {
             </p>
           </div>
         </div>
-
         {loading && <SolutionTableSkeleton/>}
         {error && <p className="text-red-500">{error}</p>}
         {!loading && !error && solutions.length > 0 && (
