@@ -1,4 +1,3 @@
-// components/SolutionTable.tsx
 import { BarChart2 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -11,39 +10,40 @@ export const SolutionTable = ({ data }: SolutionTableProps) => {
   const { userId } = useParams();
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mx-4 sm:mx-0">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h2 className="text-xl font-semibold text-gray-900">
-          Solution Types ({data.length})
-        </h2>
-      </div>
+    <div className="w-full max-w-6xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       
-      {data.length > 0 ? (
-        <div className="divide-y divide-gray-200">
-          {data.map(({ solutionType, freq, solutionName }) => (
-            <div
-              key={solutionType}
-              className="px-6 py-4 hover:bg-gray-50 transition-colors cursor-pointer"
-              onClick={() => navigate(`/user/${userId}/machines/${solutionType}`)}
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mt-1">
-                    <BarChart2 className="w-4 h-4 text-gray-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-md font-medium text-gray-900">
-                      {solutionName} 
-                    </h3>
-                  </div>
-                </div>
 
-                <div className="text-sm font-semibold text-gray-800">
-                  Machines Allotted: {freq}
-                </div>
-              </div>
-            </div>
-          ))}
+      {data.length > 0 ? (
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm text-left text-gray-700">
+            <thead className="bg-gray-100 text-xs uppercase text-gray-500">
+              <tr>
+                <th className="px-6 py-4">Solution</th>
+                <th className="px-6 py-4 text-center">Machines Allotted</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-100">
+              {data.map(({ solutionType, freq, solutionName }) => (
+                <tr
+                  key={solutionType}
+                  className="hover:bg-gray-50 transition cursor-pointer"
+                  onClick={() => navigate(`/user/${userId}/machines/${solutionType}`)}
+                >
+
+                  <td className="px-6 py-4 flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                      <BarChart2 className="w-5 h-5 text-gray-600" />
+                    </div>
+                    <span className="text-gray-800 font-medium">{solutionName}</span>
+                  </td>
+
+                  <td className="px-6 py-4 text-center font-semibold text-gray-700">
+                    {freq}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       ) : (
         <div className="p-12 text-center">

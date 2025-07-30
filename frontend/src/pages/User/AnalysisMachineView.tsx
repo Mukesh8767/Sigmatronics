@@ -1,8 +1,10 @@
 import { useParams, useNavigate } from "react-router-dom";
 import UserWrapper from "../Wrappers/UserWrapper";
 import { useDevicesBySolution } from "../../hooks/useUserDeviceSolutions";
-import { ChevronLeft, Server } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import SolutionCardSkeleton from "../../components/SolutionLoader";
+import { formatUpdatedAt } from "../../components/tables/MachineOverviewTable";
+import { Button } from "../../components/button"; // adjust the import path as per your folder structure
 
 export const AnalysisMachineView = () => {
   const { userId, solution } = useParams();
@@ -11,19 +13,20 @@ export const AnalysisMachineView = () => {
 
   return (
     <UserWrapper>
-      <div className="p-6">
-        <button
+      <div className="p-4 sm:p-6 max-w-7xl mx-auto">
+        <Button
           onClick={() => navigate(-1)}
-          className="flex items-center text-sm text-gray-700 hover:text-black hover:underline mb-4 cursor-pointer"
+          variant="outline"
+          size="sm"
+          className="mb-4 flex items-center gap-2"
         >
-          <ChevronLeft className="w-4 h-4 mr-1" />
+          <ChevronLeft className="w-4 h-4" />
           Back
-        </button>
+        </Button>
 
+        <h2 className="text-2xl font-semibold mb-6">Devices</h2>
 
-        <h2 className="text-2xl font-semibold mb-4">Devices for {solution}</h2>
-
-        {loading && <SolutionCardSkeleton/>}
+        {loading && <SolutionCardSkeleton />}
         {error && <p className="text-red-500">{error}</p>}
 
         {!loading && !error && devices.length === 0 && (
@@ -31,57 +34,60 @@ export const AnalysisMachineView = () => {
         )}
 
         {!loading && !error && devices.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 " >
-            {devices.map((device) => (
-              <div
-                key={device._id}
-                className="border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition relative cursor-pointer"
-                onClick={() => {
-                  navigate(`${device.machineId}`)
-                }}
-              >
-
-                <div
-                  className={`absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${device.status === "active"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
-                    }`}
-                >
-                  <span className="relative flex h-2 w-2">
-                    {device.status === "active" ? (
-                      <>
-                        <span className="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 animate-ping"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                      </>
-                    ) : (
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-                    )}
-                  </span>
-                  {device.status === "active" ? "Online" : "Offline"}
-                </div>
-
-
-
-
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                    <Server className="w-5 h-5 text-gray-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {device.loca}
-                  </h3>
-                </div>
-
-
-
-                <p className="text-xs text-gray-400 mt-2">
-                  Added on {new Date(device.createdAt).toLocaleDateString()}
-                </p>
-              </div>
-            ))}
+          <div className="overflow-auto rounded-lg border border-gray-200">
+            <table className="min-w-full divide-y divide-gray-200 text-sm text-left text-gray-700">
+              <thead className="bg-gray-50 font-medium text-gray-600">
+                <tr>
+                  <th className="px-5 py-3">#</th>
+                  <th className="px-5 py-3">Location</th>
+                  <th className="px-5 py-3">Capacity</th>
+                  <th className="px-5 py-3">Threshold</th>
+                  <th className="px-5 py-3">Status</th>
+                  <th className="px-5 py-3">Added On</th>
+                  <th className="px-5 py-3">Details</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 bg-white">
+                {devices.map((device, idx) => (
+                  <tr key={device._id} className="hover:bg-gray-50 transition">
+                    <td className="px-5 py-4 font-semibold">{idx + 1}</td>
+                    <td className="px-5 py-4">{device.loca}</td>
+                    <td className="px-5 py-4">{device.capacity ?? "–"}</td>
+                    <td className="px-5 py-4">
+                      {device.threshold !== undefined ? `${device.threshold}%` : "–"}
+                    </td>
+                    <td className="px-5 py-4">
+                      <span
+                        className={`inline-block px-2 py-1 text-xs rounded-full font-semibold ${
+                          device.status === "active"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {device.status}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4 text-xs text-gray-500">
+                      {formatUpdatedAt(device.createdAt)}
+                    </td>
+                    <td className="px-5 py-4">
+                      <Button
+                        onClick={() => navigate(`${device.machineId}`)}
+                        size="sm"
+                        variant="primary"
+                      >
+                        View
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
     </UserWrapper>
   );
 };
+
+export default AnalysisMachineView;

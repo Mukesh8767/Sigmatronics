@@ -86,7 +86,7 @@ export const DataVisualiser = () => {
 
   return (
     <UserWrapper>
-      <div className="p-6">
+      <div className=" p-6">
         <Back />
         <h2 className="text-xl font-semibold mb-4">Machine Data Analysis</h2>
 
@@ -106,8 +106,9 @@ export const DataVisualiser = () => {
           />
         </div>
       </div>
-
+      <div className="m-3">
       <ReadingVisualizer data={readings} />
+      </div>
     </UserWrapper>
   );
 };

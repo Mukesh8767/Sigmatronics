@@ -14,7 +14,6 @@ export const MachineView = () => {
       <div className="p-6">
         <Back/>
         
-
         <h2 className="text-2xl font-semibold mb-4">Devices</h2>
 
         {loading && <p className="text-gray-500">Loading devices...</p>}
