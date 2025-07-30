@@ -68,7 +68,7 @@ export const UserDashboard = () => {
   const { userId } = useParams();
   //@ts-ignore
   const { user } = useUserProfile(userId!);
-  const { devices, loading } = useFetchDevice(userId!);
+  const { devices } = useFetchDevice(userId!);
   const alerts = useFetchLiveAlerts();
   const { today, thisWeek } = useAnomalyStats();
   const navigate = useNavigate();
