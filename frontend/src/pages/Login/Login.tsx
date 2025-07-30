@@ -30,17 +30,17 @@ const LoginForm: React.FC = () => {
 
       toast.success("Login successful");
 
-      // Admin login
+
       if (parent === userId) {
         navigate(`/admin/${userId}/home`);
         return;
       }
 
-      // Normal user or sub-user → always go to parent dashboard
-      const targetId = parent ?? userId;
-      navigate(`/user/${targetId}`);
-
-    } catch (error: any) {
+     
+   
+        navigate(`/user/${userId}/home`);
+    }
+      catch (error: any) {
       if (error.response) {
         const status = error.response.status;
         if (status === 404) {
