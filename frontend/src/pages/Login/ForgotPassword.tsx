@@ -22,7 +22,7 @@ export const ForgotPassword: React.FC = () => {
     if (!email.trim()) return alert('Please enter your email address');
     setIsLoading(true);
     try {
-      const response = await axiosInstance.post(`${config.BACKEND_URL}/api/user/forgotPassword`, { email });
+      const response = await axiosInstance.post(`/api/user/forgotPassword`, { email });
       if (response.status === 200) setStep('otp');
       else alert('Failed to send OTP');
     } catch (error: any) {
