@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { config } from "../../config/config";
 import EmailStep from "./EmailStep";
 import OtpStep from "./OtpStep";
 import PasswordStep from "./PasswordStep";
