@@ -42,7 +42,7 @@ export const ForgotPassword: React.FC = () => {
     if (password !== confirmPassword) return alert('Passwords do not match');
     setIsLoading(true);
     try {
-      await axiosInstance.post(`${config.BACKEND_URL}/api/user/reset-Password`, { email, otp, password });
+      await axiosInstance.post(`/api/user/reset-Password`, { email, otp, password });
       alert('Password reset successful!');
       setEmail('');
       setOtp('');
