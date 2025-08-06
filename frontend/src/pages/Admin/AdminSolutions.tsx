@@ -17,6 +17,8 @@ export function AdminSolution() {
     updateSolution
   } = useSolutions();
 
+
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editData, setEditData] = useState<any | null>(null);
 
