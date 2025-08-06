@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { config } from "../../config/config";
 import EmailStep from "./EmailStep";
 import OtpStep from "./OtpStep";
 import PasswordStep from "./PasswordStep";
@@ -22,7 +21,7 @@ export const ForgotPassword: React.FC = () => {
     if (!email.trim()) return alert('Please enter your email address');
     setIsLoading(true);
     try {
-      const response = await axiosInstance.post(`${config.BACKEND_URL}/api/user/forgotPassword`, { email });
+      const response = await axiosInstance.post(`/api/user/forgotPassword`, { email });
       if (response.status === 200) setStep('otp');
       else alert('Failed to send OTP');
     } catch (error: any) {
@@ -42,7 +41,7 @@ export const ForgotPassword: React.FC = () => {
     if (password !== confirmPassword) return alert('Passwords do not match');
     setIsLoading(true);
     try {
-      await axiosInstance.post(`${config.BACKEND_URL}/api/user/reset-Password`, { email, otp, password });
+      await axiosInstance.post(`/api/user/reset-Password`, { email, otp, password });
       alert('Password reset successful!');
       setEmail('');
       setOtp('');

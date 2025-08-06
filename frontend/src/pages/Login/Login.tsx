@@ -52,7 +52,7 @@ const LoginForm: React.FC = () => {
         <div className="absolute -inset-0.5 bg-gradient-to-br from-white/10 to-white/0 opacity-10 rounded-3xl blur-3xl z-0" />
 
         <div className="relative z-10 text-center mb-8">
-          <h1 className="text-4xl font-bold tracking-tight">Sigmatrinics</h1>
+          <h1 className="text-4xl font-bold tracking-tight">Sigmatronics</h1>
           <p className="text-sm text-gray-300 mt-1">Login to your dashboard</p>
         </div>
 
