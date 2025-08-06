@@ -30,7 +30,7 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
 }) => {
   return (
     <div
-      className="fixed inset-0 bg-gray-100/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-gray-100/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 text-black" 
       onClick={onClose}
     >
       <div

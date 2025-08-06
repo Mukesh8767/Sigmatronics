@@ -1,4 +1,3 @@
-// hooks/useFetchUser.ts
 import React from "react";
 import axiosInstance from "../../utils/axiosInstance";
 

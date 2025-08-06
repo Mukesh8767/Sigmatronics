@@ -117,15 +117,15 @@ function App() {
             />
             <Route path='anamoly' element={
               <ProtectedRoute>
-                <Anamoly/>
+                <Anamoly />
               </ProtectedRoute>
-            }/>
+            } />
             <Route path='analytics/:solution' element={<ProtectedRoute>
-              <AnalysisMachineView/>
-            </ProtectedRoute>}/>
+              <AnalysisMachineView />
+            </ProtectedRoute>} />
             <Route path='analytics/:solution/:deviceName' element={<ProtectedRoute>
-              <DataVisualiser/>
-            </ProtectedRoute>}/>
+              <DataVisualiser />
+            </ProtectedRoute>} />
 
 
             <Route
@@ -148,9 +148,9 @@ function App() {
 
             <Route path="machines/:solution" element={<ProtectedRoute><MachineView /></ProtectedRoute>} />
 
-              <Route path='machines/:solution/:deviceName' element={<ProtectedRoute>
-                <MachineReadingAnalysis/>
-              </ProtectedRoute>}/>
+            <Route path='machines/:solution/:deviceName' element={<ProtectedRoute>
+              <MachineReadingAnalysis />
+            </ProtectedRoute>} />
 
           </Route>
 

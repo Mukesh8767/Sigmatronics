@@ -1,4 +1,4 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Download } from "lucide-react";
 import { useParams } from "react-router-dom";
 import DatePicker from "react-datepicker";
@@ -11,6 +11,7 @@ import axiosInstance from "../../../utils/axiosInstance";
 import { ListLoader } from "../../components/ListLoader";
 import { Button } from "../../components/button";
 import { Back } from "../../components/BackButton";
+import MapComponent from "../../components/MapComponent"; // Make sure this is correctly imported
 
 export const MachineReadingAnalysis = () => {
   const [availableDates, setAvailableDates] = useState<string[]>([]);
@@ -18,10 +19,11 @@ export const MachineReadingAnalysis = () => {
   const [readings, setReadings] = useState<any[]>([]);
   const [columns, setColumns] = useState<string[]>([]);
   const { deviceName } = useParams();
+
   const decryptId = (encoded: string): string => {
-    return atob(encoded); 
+    return atob(encoded);
   };
-  const deviceId=decryptId(deviceName||'');
+  const deviceId = decryptId(deviceName || '');
 
   useEffect(() => {
     const fetchAvailableDates = async () => {
@@ -85,26 +87,32 @@ export const MachineReadingAnalysis = () => {
 
     const fromStr = format(dateRange[0], "yyyy-MM-dd");
     const toStr = format(dateRange[1], "yyyy-MM-dd");
-    const fileName = `Report_${deviceId}_${fromStr}_to_${toStr}.xlsx`;
+    const fileName = `Report_${fromStr}_to_${toStr}.xlsx`;
 
     const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
     const dataBlob = new Blob([excelBuffer], { type: "application/octet-stream" });
     saveAs(dataBlob, fileName);
   };
 
+  const trackingCoordinates = readings
+    .map((r) => {
+      const lat = r.readings?.latitude;
+      const lng = r.readings?.longitude;
+      return lat != null && lng != null ? [lat, lng] as [number, number] : null;
+    })
+    .filter(Boolean) as [number, number][];
+
   return (
     <UserWrapper>
       <div className="p-4 sm:p-6">
-       
-          
-        <Back/>
+        <Back />
 
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
           <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">
             Machine Reading Analysis
           </h1>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
+          <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap text-black">
             <DatePicker
               selectsRange
               startDate={dateRange[0]}
@@ -118,12 +126,14 @@ export const MachineReadingAnalysis = () => {
               className="border px-3 py-2 rounded-lg shadow-sm w-full sm:w-auto text-sm"
             />
 
-          
-            <Button onClick={handleDownloadExcel}
-            disabled={readings.length===0}
-            variant="primary"
-            className="hover:text-blue-400"
-            ><Download className="w-5 h-5 " /></Button>
+            <Button
+              onClick={handleDownloadExcel}
+              disabled={readings.length === 0}
+              variant="primary"
+              className="hover:text-blue-400"
+            >
+              <Download className="w-5 h-5" />
+            </Button>
           </div>
         </div>
 
@@ -136,7 +146,6 @@ export const MachineReadingAnalysis = () => {
 
           {readings.length > 0 ? (
             <div className="overflow-x-auto">
-              {/* Mobile view */}
               <div className="block sm:hidden">
                 <div className="divide-y divide-gray-100">
                   {readings.map((r, idx) => (
@@ -169,7 +178,6 @@ export const MachineReadingAnalysis = () => {
                 </div>
               </div>
 
-              {/* Desktop view */}
               <div className="hidden sm:block">
                 <table className="min-w-full text-sm divide-y divide-gray-200">
                   <thead className="bg-gray-50 text-gray-700 font-semibold">
@@ -205,6 +213,14 @@ export const MachineReadingAnalysis = () => {
             </div>
           )}
         </div>
+
+        {/* MAP SECTION BELOW TABLE */}
+        {trackingCoordinates.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">Tracking Map</h2>
+            <MapComponent latlngs={trackingCoordinates} />
+          </div>
+        )}
       </div>
     </UserWrapper>
   );

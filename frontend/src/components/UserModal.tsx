@@ -31,7 +31,7 @@ export const UserModal = ({
   
   return (
     <div
-      className="fixed inset-0 backdrop-blur-sm bg-gray-100/50 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 backdrop-blur-sm bg-gray-100/50 z-50 flex items-center justify-center p-4 text-black"
       onClick={onClose}
     >
       <div

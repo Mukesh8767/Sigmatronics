@@ -55,7 +55,7 @@ export const MachineView = () => {
     <UserWrapper>
       <div className="p-4 sm:p-6 max-w-7xl mx-auto">
         <Back />
-        <h2 className="text-2xl font-semibold mb-6">Devices</h2>
+        <h2 className="text-2xl font-semibold mb-6 text-black">Devices</h2>
 
         {loading && <SolutionCardSkeleton />}
         {error && <p className="text-red-500">{error}</p>}

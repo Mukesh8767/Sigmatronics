@@ -8,6 +8,7 @@ export interface SolutionParameter {
   unit?: string;
   color?: string;
   group?: string;
+  alert?:boolean;
   threshold?: { min?: number; max?: number };
 }
 

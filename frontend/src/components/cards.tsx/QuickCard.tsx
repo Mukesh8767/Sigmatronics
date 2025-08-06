@@ -1,4 +1,3 @@
-// components/cards/QuickCard.tsx
 import React from 'react';
 import { TrendingUp } from 'lucide-react';
 

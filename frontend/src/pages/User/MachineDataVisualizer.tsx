@@ -9,7 +9,10 @@ import axiosInstance from "../../../utils/axiosInstance";
 import {  useParams } from "react-router-dom";
 
 export const DataVisualiser = () => {
-  const { deviceName } = useParams();
+  let { deviceName } = useParams();
+  //@ts-ignore
+  deviceName=atob(deviceName. toString());
+  console.log(deviceName);
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
   const [readings, setReadings] = useState<any[]>([]);
@@ -68,13 +71,10 @@ export const DataVisualiser = () => {
     }
   };
 
-  // Initial fetch right away
   fetchReadings();
 
-  // Start interval polling every 10 seconds
   const intervalId = setInterval(fetchReadings, 10000);
 
-  // Cleanup interval on dependency change or unmount
   return () => clearInterval(intervalId);
 }, [dateRange, deviceName]);
 
@@ -86,7 +86,7 @@ export const DataVisualiser = () => {
 
   return (
     <UserWrapper>
-      <div className=" p-6">
+      <div className=" p-6 text-black">
         <Back />
         <h2 className="text-xl font-semibold mb-4">Machine Data Analysis</h2>
 

@@ -30,7 +30,7 @@ export const AdminUsers = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
 
-  const [viewUserId, setViewUserId] = useState<string | null>(null); // ✅ state for device popup
+  const [viewUserId, setViewUserId] = useState<string | null>(null); 
 
   const filteredUsers = users.filter((user: User) =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -78,7 +78,7 @@ export const AdminUsers = () => {
         setIsEditMode(false);
         setEditingUserId(null);
         window.location.reload();
-      }, 1500);
+      }, 30000);
     } catch (err: any) {
       const msg = err.response?.data?.message || "Failed to submit form.";
       setFormError(msg);
@@ -114,7 +114,7 @@ export const AdminUsers = () => {
           users={filteredUsers}
           onSearch={setSearchTerm}
           searchTerm={searchTerm}
-          onView={(id) => setViewUserId(id)} // ✅ trigger device popup
+          onView={(id) => setViewUserId(id)} 
           onEdit={(user) => {
             const u = user as User;
             setFormData({

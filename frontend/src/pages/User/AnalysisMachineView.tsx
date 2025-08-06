@@ -1,89 +1,207 @@
 import { useParams, useNavigate } from "react-router-dom";
 import UserWrapper from "../Wrappers/UserWrapper";
 import { useDevicesBySolution } from "../../hooks/useUserDeviceSolutions";
-import { ChevronLeft } from "lucide-react";
+import {
+  MapPin,
+  Gauge,
+  TrendingUp,
+  Calendar,
+  Eye,
+  Check,
+} from "lucide-react";
 import SolutionCardSkeleton from "../../components/SolutionLoader";
 import { formatUpdatedAt } from "../../components/tables/MachineOverviewTable";
-import { Button } from "../../components/button"; // adjust the import path as per your folder structure
+import { Button } from "../../components/button";
+import { Back } from "../../components/BackButton";
 
 export const AnalysisMachineView = () => {
   const { userId, solution } = useParams();
   const navigate = useNavigate();
   const { devices, loading, error } = useDevicesBySolution(userId || "", solution || "");
+  // console.log(devices[0].machineId)
+  console.log(atob("ASQ1001"))
+  console.log(btoa("%01%04µÓM"))
+  const StatusBadge = ({ status }: { status: string }) => {
+    const active = status === "active";
+    return (
+      <span
+        className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full ${
+          active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+        }`}
+      >
+        <span
+          className={`w-1.5 h-1.5 rounded-full ${
+            active ? "bg-green-600" : "bg-red-600"
+          }`}
+        />
+        {status}
+      </span>
+    );
+  };
+
+  const TableView = () => (
+     <div className="border border-gray-200 rounded-lg overflow-x-auto">
+      <table className="w-full text-sm text-gray-700">
+        <thead className="bg-gray-100 text-gray-600 text-xs uppercase tracking-wide font-medium">
+          <tr>
+            <th className="px-4 py-2 text-left">#</th>
+            <th className="px-4 py-2 text-left">
+              <div className="flex items-center gap-1">
+                <MapPin className="w-4 h-4" /> Location
+              </div>
+            </th>
+            <th className="px-4 py-2 text-left">
+              <div className="flex items-center gap-1">
+                <Gauge className="w-4 h-4" /> Capacity
+              </div>
+            </th>
+            <th className="px-4 py-2 text-left">
+              <div className="flex items-center gap-1">
+                <TrendingUp className="w-4 h-4" /> Threshold
+              </div>
+            </th>
+            <th className="px-4 py-2 text-left">
+              <div className="flex items-center gap-1">
+                <Check className="w-4 h-4" /> Status
+              </div>
+            </th>
+            <th className="px-4 py-2 text-left">
+              <div className="flex items-center gap-1">
+                <Calendar className="w-4 h-4" /> Created
+              </div>
+            </th>
+            {/* Optional device type column:
+            <th className="px-4 py-2 text-left">
+              <div className="flex items-center gap-1">
+                <Package className="w-4 h-4" /> Type
+              </div>
+            </th>
+            */}
+            <th className="px-4 py-2 text-left">Action</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-100">
+          {devices.map((device, i) => (
+            <tr key={device._id} className="hover:bg-gray-50 transition-colors">
+              <td className="px-4 py-2 font-semibold text-blue-600">{i + 1}</td>
+              <td className="px-4 py-2 font-medium">{device.loca || "Unknown"}</td>
+              <td className="px-4 py-2">{device.capacity || "—"}</td>
+              <td className="px-4 py-2">
+                {device.threshold !== undefined ? `${device.threshold}%` : "—"}
+              </td>
+              <td className="px-4 py-2">
+                <StatusBadge status={device.status || "unknown"} />
+              </td>
+              <td className="px-4 py-2 text-gray-500">
+                {device.createdAt ? formatUpdatedAt(device.createdAt) : "—"}
+              </td>
+              {/* Optional:
+              <td className="px-4 py-2">{device.type || "—"}</td>
+              */}
+              <td className="px-4 py-2">
+                <Button
+                  onClick={() => navigate(`${btoa(device.machineId)}`)}                  
+                  variant="secondary"
+                  className="text-blue-600 hover:text-blue-800 gap-1 flex items-center"
+                >
+                  <Eye className="w-4 h-4" /> View
+                </Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  const DeviceCard = ({
+    device,
+    index,
+  }: {
+    device: any;
+    index: number;
+  }) => (
+    <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+      <div className="flex justify-between items-center mb-3">
+        <div className="flex items-center gap-2">
+          <div className="bg-blue-50 text-blue-600 text-xs w-6 h-6 flex items-center justify-center rounded-full font-bold">
+            {index + 1}
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-900">
+              {device.loca || "Unknown"}
+            </h3>
+            <StatusBadge status={device.status || "unknown"} />
+          </div>
+        </div>
+        <Button
+          onClick={() => navigate(`${atob(device.machineId)}`)}
+          size="sm"
+          variant="outline"
+          className="text-blue-600 px-2 py-1 flex items-center gap-1"
+        >
+          <Eye className="w-4 h-4" /> View
+        </Button>
+      </div>
+      <div className="grid grid-cols-2 gap-2 text-xs text-gray-700">
+        <div className="flex items-center gap-1">
+          <Gauge className="w-4 h-4 text-gray-400" /> {device.capacity || "—"}
+        </div>
+        <div className="flex items-center gap-1">
+          <TrendingUp className="w-4 h-4 text-gray-400" />{" "}
+          {device.threshold !== undefined ? `${device.threshold}%` : "—"}
+        </div>
+        <div className="col-span-2 flex items-center gap-1">
+          <Calendar className="w-4 h-4 text-gray-400" />{" "}
+          {device.createdAt ? formatUpdatedAt(device.createdAt) : "—"}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <UserWrapper>
-      <div className="p-4 sm:p-6 max-w-7xl mx-auto">
-        <Button
-          onClick={() => navigate(-1)}
-          variant="outline"
-          size="sm"
-          className="mb-4 flex items-center gap-2"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          Back
-        </Button>
-
-        <h2 className="text-2xl font-semibold mb-6">Devices</h2>
+      <div className="max-w-7xl mx-auto p-4 space-y-5">
+        <div>
+          <Back />
+          <h1 className="text-xl font-bold text-gray-900">Device Management</h1>
+          <p className="text-sm text-gray-500">
+            Devices associated with this solution
+          </p>
+        </div>
 
         {loading && <SolutionCardSkeleton />}
-        {error && <p className="text-red-500">{error}</p>}
+
+        {error && (
+          <div className="bg-red-50 border-red-200 border rounded-md p-4 text-red-700 text-sm">
+            ⚠ {error}
+          </div>
+        )}
 
         {!loading && !error && devices.length === 0 && (
-          <p className="text-gray-500">No devices found.</p>
+          <div className="bg-gray-50 border-gray-200 border rounded-md p-6 text-center text-sm text-gray-600">
+            <Gauge className="w-6 h-6 mx- mb-2 text-gray-400" />
+            <p className="font-semibold text-gray-900 mb-1">
+              No Devices Available
+            </p>
+            <p>No devices linked with this solution yet.</p>
+          </div>
         )}
 
         {!loading && !error && devices.length > 0 && (
-          <div className="overflow-auto rounded-lg border border-gray-200">
-            <table className="min-w-full divide-y divide-gray-200 text-sm text-left text-gray-700">
-              <thead className="bg-gray-50 font-medium text-gray-600">
-                <tr>
-                  <th className="px-5 py-3">#</th>
-                  <th className="px-5 py-3">Location</th>
-                  <th className="px-5 py-3">Capacity</th>
-                  <th className="px-5 py-3">Threshold</th>
-                  <th className="px-5 py-3">Status</th>
-                  <th className="px-5 py-3">Added On</th>
-                  <th className="px-5 py-3">Details</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 bg-white">
-                {devices.map((device, idx) => (
-                  <tr key={device._id} className="hover:bg-gray-50 transition">
-                    <td className="px-5 py-4 font-semibold">{idx + 1}</td>
-                    <td className="px-5 py-4">{device.loca}</td>
-                    <td className="px-5 py-4">{device.capacity ?? "–"}</td>
-                    <td className="px-5 py-4">
-                      {device.threshold !== undefined ? `${device.threshold}%` : "–"}
-                    </td>
-                    <td className="px-5 py-4">
-                      <span
-                        className={`inline-block px-2 py-1 text-xs rounded-full font-semibold ${
-                          device.status === "active"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {device.status}
-                      </span>
-                    </td>
-                    <td className="px-5 py-4 text-xs text-gray-500">
-                      {formatUpdatedAt(device.createdAt)}
-                    </td>
-                    <td className="px-5 py-4">
-                      <Button
-                        onClick={() => navigate(`${device.machineId}`)}
-                        size="sm"
-                        variant="primary"
-                      >
-                        View
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <>
+            <h2 className="text-sm font-semibold text-gray-800">
+              Devices ({devices.length})
+            </h2>
+            <div className="hidden lg:block">
+              <TableView />
+            </div>
+            <div className="lg:hidden space-y-3">
+              {devices.map((device, i) => (
+                <DeviceCard key={device._id} device={device} index={i} />
+              ))}
+            </div>
+          </>
         )}
       </div>
     </UserWrapper>

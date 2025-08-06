@@ -26,7 +26,7 @@ export const formatUpdatedAt = (dateStr: string) => {
 
 const MachineOverview: React.FC<MachineOverviewProps> = ({ devices }) => {
   return (
-    <div className="bg-white rounded-3xl border border-gray-100 shadow-lg p-6 sm:p-8 my-10 ">
+    <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 sm:p-8 my-4  ">
       <h2 className="text-2xl font-bold text-gray-900 mb-2">Machine Overview</h2>
       <p className="text-sm text-gray-500 mb-6">Access a modern overview of all deployed machines.</p>
 
@@ -35,9 +35,7 @@ const MachineOverview: React.FC<MachineOverviewProps> = ({ devices }) => {
           <thead>
             <tr className="text-left text-gray-500 border-b border-gray-100 text-xs uppercase tracking-wider">
               <th className="px-4 py-3 font-medium">#</th>
-              <th className="px-4 py-3 font-medium">Machine ID</th>
-              <th className="px-4 py-3 font-medium">Solution</th>
-              <th className="px-4 py-3 font-medium">Location</th>
+              <th className="px-4 py-3 font-medium">location</th>
               <th className="px-4 py-3 font-medium">Capacity</th>
               <th className="px-4 py-3 font-medium">Last Updated</th>
               <th className="px-4 py-3 font-medium">Status</th>
@@ -50,9 +48,7 @@ const MachineOverview: React.FC<MachineOverviewProps> = ({ devices }) => {
                 className="hover:bg-gray-50 transition-colors border-b border-gray-100 "
               >
                 <td className="px-4 py-4 text-gray-800 font-medium">{index + 1}</td>
-                <td className="px-4 py-4">{device.machineId}</td>
-                <td className="px-4 py-4 text-gray-600">{device.solutionType}</td>
-                <td className="px-4 py-4">{device.loca}</td>
+                <td className="px-4 py-4 text-gray-600">{device.loca}</td>
                 <td className="px-4 py-4">
                   {device.capacity !== undefined ? (
                     <span className="text-gray-700">{device.capacity}</span>

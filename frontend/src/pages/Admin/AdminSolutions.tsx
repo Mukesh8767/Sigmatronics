@@ -1,5 +1,5 @@
 import AdminWrapper from "../Wrappers/AdminWrapper";
-import { Plus, Trash2, Pencil } from "lucide-react";
+import { Plus, Trash2, Pencil, Bell, BellOff } from "lucide-react";
 import CreateSolutionForm from "../../components/forms/CreateSolutionForm";
 
 import { Button } from "../../components/button";
@@ -100,7 +100,7 @@ export function AdminSolution() {
 
                 <h2 className="text-lg font-semibold text-slate-800 mb-1">
                   {solution.name}
-                 </h2>
+                </h2>
                 <p className="text-sm text-slate-500 mb-2">{solution.description}</p>
                 <p className="text-xs text-slate-400 mb-3">
                   Code: <span className="font-mono text-slate-600">{solution.code}</span>
@@ -108,13 +108,18 @@ export function AdminSolution() {
 
                 <div>
                   <p className="text-sm font-medium text-slate-700 mb-1">Parameters:</p>
-                  <ul className="list-disc list-inside text-sm text-slate-600 space-y-1">
+                  <ul className="list-inside text-sm space-y-1">
                     {solution.parameters.map((param, i) => (
-                      <li key={i}>
-                        <span className="font-semibold">{param.label || param.key}</span>{" "}
-                        <span className="text-slate-500">
-                          ({param.type}{param.unit ? `, ${param.unit}` : ""})
-                        </span>
+                      <li key={i} className="flex items-center justify-between">
+                        <div>
+                          <span className="font-semibold text-slate-700">{param.label || param.key}</span>
+                          <span className="text-slate-500">
+                            {" "}({param.type}{param.unit ? `, ${param.unit}` : ""})
+                          </span>
+                        </div>
+                        <div className="text-lg text-slate-700">
+                          {param.alert ? <Bell className="w-4 h-4 text-shadow-slate-500"/> : <BellOff className="w-4 h-4 text-shadow-slate-500"/>}
+                        </div>
                       </li>
                     ))}
                   </ul>

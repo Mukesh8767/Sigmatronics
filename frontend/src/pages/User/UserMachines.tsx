@@ -14,8 +14,8 @@ export const UserMachines = () => {
       <div className="p-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
-            <h1 className="text-2xl font-semibold flex items-center gap-1">
-              <Cpu /> Machines
+            <h1 className="text-2xl font-semibold flex items-center gap-1 text-black">
+              <Cpu /> Machines Readings
             </h1>
             <p className="text-sm text-slate-500">
               Monitor and retrieve your machine's data and reports.
