@@ -1,7 +1,7 @@
 import { Route, Routes, BrowserRouter as Router } from 'react-router-dom';
 import './App.css';
 import LoginForm from './pages/Login/Login';
-import { ForgotPassword } from './pages/Login/ForgotPassword';
+import  ForgotPassword  from './pages/Login/ForgotPassword';
 import { UserDashboard } from './pages/Dashboard/User';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import { SubUserDashboard } from './pages/Dashboard/subUser';

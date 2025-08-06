@@ -1,27 +1,23 @@
-import { Eye, EyeClosed, Lock, Mail } from "lucide-react";
-import { Button } from "../../components/button";
-import Input from "../../components/input";
+import { Eye, EyeOff, Lock, LogIn, Mail } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../../utils/axiosInstance";
 import { toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import InputField from "./InputField";
+import { Button } from "../../components/button";
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [focusedField, setFocusedField] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = async () => {
     setIsLoading(true);
     try {
-      const response = await axiosInstance.post(`/api/user/signin`, {
-        email,
-        password
-      });
-
+      const response = await axiosInstance.post(`/api/user/signin`, { email, password });
       const { accessToken, userId, parent } = response.data;
 
       localStorage.setItem('accessToken', accessToken);
@@ -46,68 +42,75 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-white flex items-center justify-center px-4">
-      <div className="relative bg-white/5 backdrop-blur-md border border-white/20 rounded-3xl shadow-xl w-full max-w-md p-8 sm:p-10 text-white">
-        {/* Glow Layer */}
-        <div className="absolute -inset-0.5 bg-gradient-to-br from-white/10 to-white/0 opacity-10 rounded-3xl blur-3xl z-0" />
-
-        <div className="relative z-10 text-center mb-8">
-          <h1 className="text-4xl font-bold tracking-tight">Sigmatronics</h1>
-          <p className="text-sm text-gray-300 mt-1">Login to your dashboard</p>
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md p-10 rounded-2xl shadow-xl bg-white">
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center mb-4">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-slate-500 to-gray-500 rounded-full blur opacity-30" />
+              <div className="relative bg-gradient-to-r from-slate-500 to-gray-600 p-3 rounded-full shadow-lg">
+                <LogIn className="w-6 h-6 text-white" />
+              </div>
+            </div>
+          </div>
+          <h1 className="text-4xl font-bold text-slate-800 mb-2">Welcome Back</h1>
+          <p className="text-slate-600">Login to access your dashboard</p>
         </div>
 
-        <div className="space-y-6 relative z-10">
-          <Input
+        <div className="space-y-6">
+          <InputField
             type="email"
-            placeholder="Email"
+            placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             icon={Mail}
-            className="bg-white/10 text-white placeholder-gray-400 border border-white/20"
+            name="email"
+            focusedField={focusedField}
+            setFocusedField={setFocusedField}
           />
 
-          <Input
-            type={showPassword ? 'text' : 'password'}
-            placeholder="Password"
+          <InputField
+            type={showPassword ? "text" : "password"}
+            placeholder="Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             icon={Lock}
-            rightIcon={showPassword ? Eye : EyeClosed}
+            rightIcon={showPassword ? Eye : EyeOff}
             onRightIconClick={() => setShowPassword(!showPassword)}
-            className="bg-white/10 text-white placeholder-gray-400 border border-white/20"
+            name="password"
+            focusedField={focusedField}
+            setFocusedField={setFocusedField}
           />
 
-          <div className="text-right text-sm">
+          <div className="text-right">
             <button
               onClick={() => navigate('/forgotPassword')}
-              className="text-gray-300 hover:text-white underline underline-offset-2"
+              className="text-slate-600 hover:text-slate-800 text-sm underline underline-offset-4"
             >
               Forgot password?
             </button>
           </div>
 
-          <Button
-            onClick={handleLogin}
-            className="w-full bg-gradient-to-r from-white/90 to-gray-300 text-black font-semibold hover:brightness-110 transition-all"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <div className="flex items-center gap-2">
-                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="black" strokeWidth="4" />
-                  <path
-                    className="opacity-75"
-                    fill="black"
-                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                  />
-                </svg>
-                Logging in...
-              </div>
-            ) : 'Log In'}
-          </Button>
+          <div className="flex justify-center">
+            <Button
+              onClick={handleLogin}
+              disabled={isLoading}
+              className="w-fit px-6 py-2 flex items-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Logging in...
+                </>
+              ) : (
+                <>
+                  <LogIn className="w-5 h-5" />
+                  Log In
+                </>
+              )}
+            </Button>
+          </div>
         </div>
-
-
       </div>
     </div>
   );
