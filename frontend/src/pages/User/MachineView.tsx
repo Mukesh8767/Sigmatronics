@@ -9,7 +9,7 @@ import { useUpdateCapacity } from "../../hooks/useUpdateCapacity";
 import { Back } from "../../components/BackButton";
 import SolutionCardSkeleton from "../../components/SolutionLoader";
 import { formatUpdatedAt } from "../../components/tables/MachineOverviewTable";
-import { Button } from "../../components/button"; // Adjust path if needed
+import { Button } from "../../components/button";
 
 export const MachineView = () => {
   const { userId, solution } = useParams();
@@ -51,6 +51,15 @@ export const MachineView = () => {
 
   const encryptId = (id: string) => btoa(id);
 
+  // Collect all unique parameter labels across devices
+  const allParameterLabels = Array.from(
+    new Set(
+      devices.flatMap((device) =>
+        device.parameters?.map((param) => param.label) || []
+      )
+    )
+  );
+
   return (
     <UserWrapper>
       <div className="p-4 sm:p-6 max-w-7xl mx-auto">
@@ -63,7 +72,7 @@ export const MachineView = () => {
 
         {!loading && devices.length > 0 && (
           <div className="w-full overflow-x-auto rounded-lg border border-gray-200">
-            <table className="min-w-[800px] w-full text-sm text-left text-gray-700">
+            <table className="min-w-[1000px] w-full text-sm text-left text-gray-700">
               <thead className="bg-gray-100 font-medium text-gray-600 whitespace-nowrap">
                 <tr>
                   <th className="px-4 py-3">#</th>
@@ -71,11 +80,17 @@ export const MachineView = () => {
                   <th className="px-4 py-3">Location</th>
                   <th className="px-4 py-3">Capacity</th>
                   <th className="px-4 py-3">Threshold</th>
+
+                  {allParameterLabels.map((label) => (
+                    <th key={label} className="px-4 py-3">{label}</th>
+                  ))}
+
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3">Added On</th>
                   <th className="px-4 py-3 text-center">Actions</th>
                 </tr>
               </thead>
+
               <tbody className="bg-white divide-y divide-gray-100">
                 {devices.map((d, idx) => (
                   <tr
@@ -84,14 +99,17 @@ export const MachineView = () => {
                     onClick={() => navigate(encryptId(d.machineId))}
                   >
                     <td className="px-4 py-3 font-semibold">{idx + 1}</td>
+                    <td className="px-4 py-3">{d.machineId}</td>
 
-                    <td className="px-4 py-3 max-w-[200px] truncate">
+                    <td className="px-4 py-3">
                       {editId === d._id ? (
                         <input
                           type="text"
                           value={formData.location}
                           onClick={(e) => e.stopPropagation()}
-                          onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                          onChange={(e) =>
+                            setFormData({ ...formData, location: e.target.value })
+                          }
                           className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring focus:outline-none"
                         />
                       ) : (
@@ -105,7 +123,9 @@ export const MachineView = () => {
                           type="number"
                           value={formData.capacity ?? ""}
                           onClick={(e) => e.stopPropagation()}
-                          onChange={(e) => setFormData({ ...formData, capacity: Number(e.target.value) })}
+                          onChange={(e) =>
+                            setFormData({ ...formData, capacity: Number(e.target.value) })
+                          }
                           className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring focus:outline-none"
                         />
                       ) : (
@@ -119,7 +139,12 @@ export const MachineView = () => {
                           type="number"
                           value={formData.threshold ?? ""}
                           onClick={(e) => e.stopPropagation()}
-                          onChange={(e) => setFormData({ ...formData, threshold: Number(e.target.value) })}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              threshold: Number(e.target.value),
+                            })
+                          }
                           className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring focus:outline-none"
                         />
                       ) : d.threshold !== undefined ? (
@@ -128,6 +153,15 @@ export const MachineView = () => {
                         "–"
                       )}
                     </td>
+
+                    {allParameterLabels.map((label) => {
+                      const param = d.parameters?.find((p) => p.label === label);
+                      return (
+                        <td key={label} className="px-4 py-3">
+                          {param ? `${param.reading} ${param.unit}` : "–"}
+                        </td>
+                      );
+                    })}
 
                     <td className="px-4 py-3">
                       <span
@@ -141,7 +175,9 @@ export const MachineView = () => {
                       </span>
                     </td>
 
-                    <td className="px-4 py-3 text-xs text-gray-500">{formatUpdatedAt(d.createdAt)}</td>
+                    <td className="px-4 py-3 text-xs text-gray-500">
+                      {formatUpdatedAt(d.createdAt)}
+                    </td>
 
                     <td className="px-4 py-3 text-center">
                       {editId === d._id ? (

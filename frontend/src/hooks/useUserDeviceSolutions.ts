@@ -5,6 +5,20 @@ interface DeviceSolution {
   solutionType: string;
   freq: number;
 }
+interface ParameterType {
+  key: string;
+  label: string;
+  unit: string;
+  type: string; // e.g., "line", "bar", etc.
+  color: string;
+  group: string;
+  threshold: {
+    min: number;
+    max: number;
+  };
+  alert: boolean;
+  reading: number;
+}
 
 export const useUserDeviceSolutions = (userId: string) => {
   const [solutions, setSolutions] = useState<DeviceSolution[]>([]);
@@ -44,6 +58,7 @@ interface DeviceType {
   updatedAt: string;
   capacity:number;
   threshold:number;
+ parameters?: ParameterType[];
 }
 
 
