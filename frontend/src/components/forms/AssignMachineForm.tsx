@@ -21,7 +21,7 @@ const DeviceAssignmentForm: React.FC<DeviceAssignmentFormProps> = ({ onClose, on
     assignedTo: '',
     solutionType: '',
     numberOfMachines: 1,
-    machineDetails: [{ id: '', loca: '', capacity: '' }]
+    machineDetails: [{ id: '', loca: '', capacity: '' , longitude: '', latitude: '' }]
   });
   console.log(formData);
 
@@ -37,7 +37,9 @@ const DeviceAssignmentForm: React.FC<DeviceAssignmentFormProps> = ({ onClose, on
       const updatedDetails = Array(prev.numberOfMachines).fill('').map((_, i) => ({
         id: prev.machineDetails[i]?.id || '',
         loca: prev.machineDetails[i]?.loca || '',
-        capacity: prev.machineDetails[i]?.capacity || ''
+        capacity: prev.machineDetails[i]?.capacity || '',
+        longitude: prev.machineDetails[i]?.longitude || '',
+        latitude: prev.machineDetails[i]?.latitude || ''
       }));
       return { ...prev, machineDetails: updatedDetails };
     });
@@ -59,7 +61,7 @@ const DeviceAssignmentForm: React.FC<DeviceAssignmentFormProps> = ({ onClose, on
     }
   };
 
-  const handleMachineDetailChange = (index: number, field: 'id' | 'loca' | 'capacity', value: string) => {
+  const handleMachineDetailChange = (index: number, field: 'id' | 'loca' | 'capacity'|'longitude'|'latitude', value: string) => {
     const updated = [...formData.machineDetails];
     updated[index][field] = value;
     setFormData(prev => ({ ...prev, machineDetails: updated }));
@@ -86,7 +88,9 @@ const DeviceAssignmentForm: React.FC<DeviceAssignmentFormProps> = ({ onClose, on
       numberOfMachines: formData.numberOfMachines,
       machineIds: fullIds,
       loca: formData.machineDetails.map(m => m.loca),
-      capacities: formData.machineDetails.map(m => m.capacity)
+      capacities: formData.machineDetails.map(m => m.capacity),
+      longitude:formData.machineDetails.map(m => m.longitude),
+      latitude: formData.machineDetails.map(m => m.latitude)
     };
 
     try {
@@ -97,7 +101,7 @@ const DeviceAssignmentForm: React.FC<DeviceAssignmentFormProps> = ({ onClose, on
           assignedTo: '',
           solutionType: '',
           numberOfMachines: 1,
-          machineDetails: [{ id: '', loca: '', capacity: '' }]
+          machineDetails: [{ id: '', loca: '', capacity: '', longitude: '', latitude: ''  }]
         });
         setCurrentStep(1);
         onRefresh();
@@ -210,13 +214,23 @@ const DeviceAssignmentForm: React.FC<DeviceAssignmentFormProps> = ({ onClose, on
                     placeholder="Location (e.g., Floor 2)"
                     icon={MapPin}
                   />
+                  
                   <Input
-                    type="number"
-                    value={detail.capacity}
-                    onChange={(e) => handleMachineDetailChange(index, 'capacity', e.target.value)}
-                    placeholder="Capacity"
-                    icon={ChevronRight}
-                  />
+            type="number"
+          value={detail.latitude}
+            onChange={(e) => handleMachineDetailChange(index, 'latitude', e.target.value)}
+         placeholder="Latitude (optional)"
+            icon={MapPin}
+                />
+
+          <Input
+         type="number"
+        value={detail.longitude}
+        onChange={(e) => handleMachineDetailChange(index, 'longitude', e.target.value)}
+           placeholder="Longitude (optional)"
+         icon={MapPin}
+                     />
+
                 </div>
               ))}
             </div>
