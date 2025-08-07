@@ -67,6 +67,7 @@ export const MachineView = () => {
               <thead className="bg-gray-100 font-medium text-gray-600 whitespace-nowrap">
                 <tr>
                   <th className="px-4 py-3">#</th>
+                  <th className="px-4 py-3">Machine ID</th>
                   <th className="px-4 py-3">Location</th>
                   <th className="px-4 py-3">Capacity</th>
                   <th className="px-4 py-3">Threshold</th>

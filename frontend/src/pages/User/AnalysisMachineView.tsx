@@ -44,7 +44,13 @@ export const AnalysisMachineView = () => {
       <table className="w-full text-sm text-gray-700">
         <thead className="bg-gray-100 text-gray-600 text-xs uppercase tracking-wide font-medium">
           <tr>
-            <th className="px-4 py-2 text-left">#</th>
+             <th className="px-4 py-2 text-left">#</th>
+          <th className="px-4 py-2 text-left">
+         <div className="flex items-center gap-1">
+        <Gauge className="w-4 h-4" /> Machine ID
+       </div>
+         </th>
+         
             <th className="px-4 py-2 text-left">
               <div className="flex items-center gap-1">
                 <MapPin className="w-4 h-4" /> Location
@@ -84,6 +90,10 @@ export const AnalysisMachineView = () => {
           {devices.map((device, i) => (
             <tr key={device._id} className="hover:bg-gray-50 transition-colors">
               <td className="px-4 py-2 font-semibold text-blue-600">{i + 1}</td>
+              <td className="px-4 py-2 font-mono">
+  {`${device.loca || "LOC"}_${device.machineId?.substring(4, 8) || "---"}`}
+</td>
+
               <td className="px-4 py-2 font-medium">{device.loca || "Unknown"}</td>
               <td className="px-4 py-2">{device.capacity || "—"}</td>
               <td className="px-4 py-2">

@@ -35,6 +35,7 @@ const MachineOverview: React.FC<MachineOverviewProps> = ({ devices }) => {
           <thead>
             <tr className="text-left text-gray-500 border-b border-gray-100 text-xs uppercase tracking-wider">
               <th className="px-4 py-3 font-medium">#</th>
+              <th className="px-4 py-3 font-medium">MachineId</th>
               <th className="px-4 py-3 font-medium">location</th>
               <th className="px-4 py-3 font-medium">Capacity</th>
               <th className="px-4 py-3 font-medium">Last Updated</th>
@@ -48,6 +49,10 @@ const MachineOverview: React.FC<MachineOverviewProps> = ({ devices }) => {
                 className="hover:bg-gray-50 transition-colors border-b border-gray-100 "
               >
                 <td className="px-4 py-4 text-gray-800 font-medium">{index + 1}</td>
+                <td className="px-4 py-2 text-gray-600">
+            {`${device.loca || "LOC"}_${device.machineId?.substring(4, 8) || "---"}`}
+                  </td>
+
                 <td className="px-4 py-4 text-gray-600">{device.loca}</td>
                 <td className="px-4 py-4">
                   {device.capacity !== undefined ? (

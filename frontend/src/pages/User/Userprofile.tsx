@@ -255,7 +255,7 @@ export const UserProfile: React.FC = () => {
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
                     <Monitor className="w-4 h-4 text-gray-500" />
-                    <span className="font-medium text-gray-900">{machine.machineId}</span>
+                    <span className="font-medium text-gray-900">  {`${machine.loca}_${machine.machineId.substring(4, 8)}`}</span>
                   </label>
                 ))
               )}
