@@ -92,11 +92,15 @@ export function UserDashboard(){
   const online = devices.filter((d) => d.status === 'active').length;
   const offline = total - online;
   const uptime = total > 0 ? Math.round((online / total) * 100) : 0;
+  const currentDate=new Date().toString().slice(0,10);
+  const alertCount=alerts.alerts.filter(alert=>
+    new Date(alert.createdAt).toString().slice(0,10)===currentDate
+  ).length
+
 
   return (
     <UserWrapper>
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/50">
-        {/* Header */}
         <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
           <div className="max-w-7xl mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
@@ -107,9 +111,9 @@ export function UserDashboard(){
                 
                 <button className="relative p-2 hover:bg-gray-100 rounded-xl transition-colors" onClick={()=>navigate(`/user/${userId}/anamoly`)}>
                   <Bell size={20} className="text-gray-700"  />
-                  {alerts.alerts.length > 0 && (
+                  {alertCount > 0 && (
                     <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-                      <span className="text-xs text-white font-medium">{alerts.alerts.length}</span>
+                      <span className="text-xs text-white font-medium">{alertCount}</span>
                     </div>
                   )}
                 </button>

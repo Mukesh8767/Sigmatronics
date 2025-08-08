@@ -6,13 +6,15 @@ import { Calendar } from "lucide-react";
 import DatePicker from "react-datepicker";
 import { format } from "date-fns";
 import axiosInstance from "../../../utils/axiosInstance";
-import {  useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { decodeBase64 } from "../../../utils/base64"; // ✅ import
 
 export const DataVisualiser = () => {
   let { deviceName } = useParams();
-  //@ts-ignore
-  deviceName=atob(deviceName. toString());
-  console.log(deviceName);
+
+  deviceName = decodeBase64((deviceName || "").toString());
+  console.log("Decoded device name:", deviceName);
+
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
   const [readings, setReadings] = useState<any[]>([]);
@@ -37,47 +39,46 @@ export const DataVisualiser = () => {
   }, [deviceName]);
 
   useEffect(() => {
-  const [from, to] = dateRange;
-  if (!from || !to) return;
+    const [from, to] = dateRange;
+    if (!from || !to) return;
 
-  const fromStr = format(from, "yyyy-MM-dd");
-  const toStr = format(to, "yyyy-MM-dd");
+    const fromStr = format(from, "yyyy-MM-dd");
+    const toStr = format(to, "yyyy-MM-dd");
 
-  const fetchReadings = async () => {
-    try {
-      const res = await axiosInstance(
-        `/api/deviceReading/readings/by-date/${deviceName}?from=${fromStr}&to=${toStr}`
-      );
+    const fetchReadings = async () => {
+      try {
+        const res = await axiosInstance(
+          `/api/deviceReading/readings/by-date/${deviceName}?from=${fromStr}&to=${toStr}`
+        );
 
-      const data = res.data;
+        const data = res.data;
 
-      if (data.readings && data.readings.length > 0 && data.solution) {
-        const solution = data.solution;
+        if (data.readings && data.readings.length > 0 && data.solution) {
+          const solution = data.solution;
 
-        const transformed = data.readings.map((r: any) => ({
-          reading: r.readings,
-          createdAt: r.createdAt,
-          timestamp: r.timestamp,
-          solution: solution,
-        }));
+          const transformed = data.readings.map((r: any) => ({
+            reading: r.readings,
+            createdAt: r.createdAt,
+            timestamp: r.timestamp,
+            solution: solution,
+          }));
 
-        setReadings(transformed);
-      } else {
+          setReadings(transformed);
+        } else {
+          setReadings([]);
+        }
+      } catch (error) {
+        console.error("Error fetching readings:", error);
         setReadings([]);
       }
-    } catch (error) {
-      console.error("Error fetching readings:", error);
-      setReadings([]);
-    }
-  };
+    };
 
-  fetchReadings();
+    fetchReadings();
 
-  const intervalId = setInterval(fetchReadings, 10000);
+    const intervalId = setInterval(fetchReadings, 10000);
 
-  return () => clearInterval(intervalId);
-}, [dateRange, deviceName]);
-
+    return () => clearInterval(intervalId);
+  }, [dateRange, deviceName]);
 
   const isDateAvailable = (date: Date) => {
     const str = format(date, "yyyy-MM-dd");
@@ -86,7 +87,7 @@ export const DataVisualiser = () => {
 
   return (
     <UserWrapper>
-      <div className=" p-6 text-black">
+      <div className="p-6 text-black">
         <Back />
         <h2 className="text-xl font-semibold mb-4">Machine Data Analysis</h2>
 
@@ -107,7 +108,7 @@ export const DataVisualiser = () => {
         </div>
       </div>
       <div className="m-3">
-      <ReadingVisualizer data={readings} />
+        <ReadingVisualizer data={readings} />
       </div>
     </UserWrapper>
   );
