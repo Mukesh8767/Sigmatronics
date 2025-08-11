@@ -99,7 +99,7 @@ export const MachineView = () => {
                     onClick={() => navigate(encryptId(d.machineId))}
                   >
                     <td className="px-4 py-3 font-semibold">{idx + 1}</td>
-                    <td className="px-4 py-3">{d.machineId}</td>
+                      {`${d.loca || "LOC"}_${d.machineId?.substring(4, 8) || "---"}`}
 
                     <td className="px-4 py-3">
                       {editId === d._id ? (
