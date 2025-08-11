@@ -1,20 +1,22 @@
-export const transformMachineCode=(input:String)=> {
-    let str = input.split(""); 
-
-    for (let i = 0; i < 4; i++) {
-        let ch = str[i];
-        if(ch>='A' && ch<='Z'){
-            let index = ch.charCodeAt(0) - 'A'.charCodeAt(0);
-            ch = String.fromCharCode('A'.charCodeAt(0) + (25 - index));
-    }
-        str[i] = ch;
+export const transformMachineCode = (input?: string): string => {
+    if (!input) {
+        return ""; 
     }
 
-    let substr1 = str.slice(0, 4).join("");
-    let substr2 = str.slice(4).join("");
+    let result = "";
 
-    return `${substr1}_${substr2}`;
-}
+    for (let i = 0; i < 4 && i < input.length; i++) {
+        let ch = input[i];
 
+        if (ch >= "A" && ch <= "Z") {
+            const index = ch.charCodeAt(0) - "A".charCodeAt(0);
+            ch = String.fromCharCode("A".charCodeAt(0) + (25 - index));
+        }
 
+        result += ch;
+    }
 
+    const substr1 = input.substring(4, input.length);
+
+    return `${result}_${substr1}`;
+};

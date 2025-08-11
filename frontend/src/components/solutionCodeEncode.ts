@@ -1,16 +1,16 @@
-export function transformSolutionCode(input:String) {
-    let str = input.split(""); 
+export function transformSolutionCode(input: string) {
+    let strArr: string[] = input.split("");
 
     for (let i = 0; i < 4; i++) {
-        let ch = str[i];
-        if(ch>='A' && ch<='Z'){
+        let ch = strArr[i];
+        if (ch >= 'A' && ch <= 'Z') {
             let index = ch.charCodeAt(0) - 'A'.charCodeAt(0);
             ch = String.fromCharCode('A'.charCodeAt(0) + (25 - index));
-    }
-        str[i] = ch;
+        }
+        strArr[i] = ch;
     }
 
-    let substr1 = str.slice(0, 4).join("");
+    let substr1 = strArr.slice(0, 4).join("");
 
     return `${substr1}`;
 }

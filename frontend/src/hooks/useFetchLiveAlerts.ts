@@ -1,43 +1,47 @@
-import { useEffect, useState } from 'react';
-import axiosInstance from '../../utils/axiosInstance';
-import { useParams } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axiosInstance from "../../utils/axiosInstance";
 
-interface Alert {
+export interface Alert {
   message: string;
-  createdAt: string; 
-  machineId:string;
+  createdAt: string;
+  machineId: string;
+}
+
+interface AlertsApiResponse {
+  alerts: Alert[];
 }
 
 export const useFetchLiveAlerts = () => {
   const [alerts, setAlerts] = useState<Alert[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const {userId}=useParams();
+
+  const { userId } = useParams();
 
   useEffect(() => {
-    const fetchAlerts = async () => {
-      if (!userId) return;
+    if (!userId) return;
 
+    const fetchAlerts = async () => {
       setLoading(true);
+      setError(null);
+
       try {
-        const res = await axiosInstance(`/api/alert/by-user/${userId}`);
-        if (!res) {
-          throw new Error('Failed to fetch alerts');
-        }
+        const res = await axiosInstance.get<AlertsApiResponse>(
+          `/api/alert/by-user/${userId}`
+        );
 
         console.log(res);
 
-        const data = res.data;
+        if (!res.data || !Array.isArray(res.data.alerts)) {
+          throw new Error("Invalid alerts response format");
+        }
 
-        const extractedAlerts = data.alerts.map((alert: any) => ({
-          message: alert.message,
-          createdAt: alert.createdAt,
-          machineId:alert.machineId
-        }));
-
-        setAlerts(extractedAlerts);
-      } catch (err: any) {
-        setError(err.message || 'Unknown error');
+        // Assign alerts directly (no need to remap if API matches interface)
+        setAlerts(res.data.alerts);
+      } catch (err) {
+        console.error("Error fetching alerts:", err);
+        setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
         setLoading(false);
       }
