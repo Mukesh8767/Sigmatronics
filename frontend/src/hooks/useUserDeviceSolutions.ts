@@ -5,20 +5,20 @@ interface DeviceSolution {
   solutionType: string;
   freq: number;
 }
-interface ParameterType {
-  key: string;
-  label: string;
-  unit: string;
-  type: string; // e.g., "line", "bar", etc.
-  color: string;
-  group: string;
-  threshold: {
-    min: number;
-    max: number;
-  };
-  alert: boolean;
-  reading: number;
-}
+// interface ParameterType {
+//   key: string;
+//   label: string;
+//   unit: string;
+//   type: string; // e.g., "line", "bar", etc.
+//   color: string;
+//   group: string;
+//   threshold: {
+//     min: number;
+//     max: number;
+//   };
+//   alert: boolean;
+//   reading: number;
+// }
 
 export const useUserDeviceSolutions = (userId: string) => {
   const [solutions, setSolutions] = useState<DeviceSolution[]>([]);
@@ -46,20 +46,28 @@ export const useUserDeviceSolutions = (userId: string) => {
 
   return { solutions, loading, error };
 };
-
-interface DeviceType {
+export type DeviceType = {
   _id: string;
   machineId: string;
-  assignedTo: string;
-  solutionType: string;
   loca: string;
+  latitude?: number;     
+  longitude?: number;   
   status: string;
   createdAt: string;
-  updatedAt: string;
-  capacity:number;
-  threshold:number;
- parameters?: ParameterType[];
-}
+  parameters?: Array<{
+    key: string;
+    label: string;
+    reading?: number;
+    unit?: string;
+    threshold?: {
+      min?: number;
+      max?: number;
+    };
+    [key: string]: any;
+  }>;
+  [key: string]: any;
+};
+
 
 
 export const useDevicesBySolution = (

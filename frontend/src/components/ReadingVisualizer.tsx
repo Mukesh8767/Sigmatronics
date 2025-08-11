@@ -38,6 +38,7 @@ import 'leaflet/dist/leaflet.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import { formatUpdatedAt } from './tables/MachineOverviewTable';
+
 const DefaultIcon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow,
@@ -173,9 +174,8 @@ const ReadingVisualizer: React.FC<ReadingVisualizerProps> = ({ data }) => {
     const Icon = getTypeIcon(param.type);
     const colorClass = getTypeColor(param.type);
 
-    const isGeoKey = ['latitude', 'longitude'].includes(param.key.toLowerCase());
-    const showLocationLink = param.type !== 'geo' && param.type === 'badge' && isGeoKey;
 
+    // GEO
     if (param.type === 'geo') {
       const latlngs = data
         .map((row) => row.reading.latitude && row.reading.longitude
@@ -219,51 +219,81 @@ const ReadingVisualizer: React.FC<ReadingVisualizerProps> = ({ data }) => {
       );
     }
 
-    if (showLocationLink) {
-      const lat = data[0]?.reading.latitude;
-      const lng = data[0]?.reading.longitude;
+    // BADGE
+    if (param.type === 'badge') {
+      const latestValue = getValues(param.key).slice(-1)[0];
       return (
-        <div
-          onClick={() => {
-            if (lat && lng) {
-              window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
-            }
-          }}
-          className="cursor-pointer bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className={`w-12 h-12 bg-gradient-to-br ${colorClass} rounded-xl flex items-center justify-center`}>
-              <MapPin className="w-6 h-6 text-white" />
-            </div>
-            <h4 className="font-semibold text-gray-900">Location</h4>
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
+          <div className={`w-12 h-12 bg-gradient-to-br ${colorClass} rounded-xl flex items-center justify-center`}>
+            <Icon className="w-6 h-6 text-white" />
           </div>
-          <p className="text-gray-700 text-sm">Click to open latest location on map</p>
+          <div>
+            <h4 className="font-semibold text-gray-900">{label}</h4>
+            <p className="text-lg font-bold">{latestValue}</p>
+          </div>
         </div>
       );
     }
 
-    if (isGeoKey && param.type !== 'badge') {
-      return null;
-    }
-
-    return (
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
+    // NUMBER
+    if (param.type === 'number') {
+      const latestValue = getValues(param.key).slice(-1)[0];
+      return (
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center gap-3 mb-2">
             <div className={`w-12 h-12 bg-gradient-to-br ${colorClass} rounded-xl flex items-center justify-center`}>
               <Icon className="w-6 h-6 text-white" />
             </div>
             <h4 className="font-semibold text-gray-900">{label}</h4>
           </div>
-          <button onClick={() => setExpandedChart(expandedChart === param.key ? null : param.key)}>
-            {expandedChart === param.key ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
-          </button>
+          <div className="text-3xl font-bold">{latestValue}{param.unit ? ` ${param.unit}` : ''}</div>
         </div>
-        <div className={`transition-all duration-300 ${expandedChart === param.key ? 'h-[300px]' : 'h-[180px]'}`}>
-          <LineChart data={generateChartData(param)} options={chartOptions} />
+      );
+    }
+
+    // GAUGE
+    if (param.type === 'gauge') {
+      const latestValue = getValues(param.key).slice(-1)[0];
+      const percentage = Math.min(Math.max((latestValue / 100) * 100, 0), 100);
+      return (
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center gap-3 mb-4">
+            <div className={`w-12 h-12 bg-gradient-to-br ${colorClass} rounded-xl flex items-center justify-center`}>
+              <Icon className="w-6 h-6 text-white" />
+            </div>
+            <h4 className="font-semibold text-gray-900">{label}</h4>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-4">
+            <div className="bg-orange-500 h-4 rounded-full" style={{ width: `${percentage}%` }}></div>
+          </div>
+          <div className="text-sm text-gray-600 mt-1">{latestValue}{param.unit ? ` ${param.unit}` : ''}</div>
         </div>
-      </div>
-    );
+      );
+    }
+
+    // CHARTS (line, bar, pie)
+    if (['line', 'bar', 'pie'].includes(param.type)) {
+      return (
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className={`w-12 h-12 bg-gradient-to-br ${colorClass} rounded-xl flex items-center justify-center`}>
+                <Icon className="w-6 h-6 text-white" />
+              </div>
+              <h4 className="font-semibold text-gray-900">{label}</h4>
+            </div>
+            <button onClick={() => setExpandedChart(expandedChart === param.key ? null : param.key)}>
+              {expandedChart === param.key ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+            </button>
+          </div>
+          <div className={`transition-all duration-300 ${expandedChart === param.key ? 'h-[300px]' : 'h-[180px]'}`}>
+            <LineChart data={generateChartData(param)} options={chartOptions} />
+          </div>
+        </div>
+      );
+    }
+
+    return null;
   };
 
   return (
@@ -276,13 +306,13 @@ const ReadingVisualizer: React.FC<ReadingVisualizerProps> = ({ data }) => {
         <Zap className="w-5 h-5 text-purple-500" />
         <span>Live Data</span>
       </div>
-      
 
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {parameters.map((param) => (
           <DataCard key={param.key} param={param} />
         ))}
       </div>
+
       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-8 border border-gray-200">
         <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
           <Info className="w-6 h-6 text-blue-500" />

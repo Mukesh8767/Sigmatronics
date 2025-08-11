@@ -1,4 +1,5 @@
 import React from 'react';
+import { transformMachineCode } from '../machineCodeEncoder';
 
 type Device = {
   _id: string;
@@ -50,7 +51,7 @@ const MachineOverview: React.FC<MachineOverviewProps> = ({ devices }) => {
               >
                 <td className="px-4 py-4 text-gray-800 font-medium">{index + 1}</td>
                 <td className="px-4 py-2 text-gray-600">
-            {`${device.loca || "LOC"}_${device.machineId?.substring(4, 8) || "---"}`}
+            {transformMachineCode(device.machineId)}
                   </td>
 
                 <td className="px-4 py-4 text-gray-600">{device.loca}</td>

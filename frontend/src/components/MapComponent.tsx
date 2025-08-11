@@ -35,7 +35,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ latlngs }) => {
       zoom={13}
       scrollWheelZoom={true}
       style={{
-        height: '500px', 
+        height: '100%', 
         width: '100%',
         borderRadius: '12px',
         marginBottom: '2rem',

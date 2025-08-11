@@ -105,7 +105,7 @@ const UserWrapper = ({ children }: { children: React.ReactNode }) => {
 
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         {isMobile && (
-          <header className="flex justify-between items-center px-4 py-3 shadow bg-black text-white border-b border-white/20">
+          <header className="flex justify-between items-center  px-4 py-3 shadow bg-black text-white border-b border-white/20">
             <span className="text-lg font-semibold">Sigmatronics</span>
             <LogOut onClick={() => {
                 localStorage.clear();
@@ -116,7 +116,7 @@ const UserWrapper = ({ children }: { children: React.ReactNode }) => {
         <main className="flex-1 overflow-auto bg-white  ">{children}</main>
 
         {isMobile && (
-          <nav className="fixed bottom-0 left-0 right-0 z-10 bg-black border-t border-white/20 shadow-inner flex justify-around py-2">
+          <nav className="fixed bottom-0 left-0 right-0 z-10 bg-black border-t border-white/20 shadow-inner flex justify-around py-4">
             {navItems.map(({ label, icon: Icon, path }) => (
               <button
                 key={label}

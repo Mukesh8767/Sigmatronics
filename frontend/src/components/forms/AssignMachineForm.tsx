@@ -37,7 +37,6 @@ const DeviceAssignmentForm: React.FC<DeviceAssignmentFormProps> = ({ onClose, on
       const updatedDetails = Array(prev.numberOfMachines).fill('').map((_, i) => ({
         id: prev.machineDetails[i]?.id || '',
         loca: prev.machineDetails[i]?.loca || '',
-      
         longitude: prev.machineDetails[i]?.longitude || '',
         latitude: prev.machineDetails[i]?.latitude || ''
       }));
@@ -61,7 +60,7 @@ const DeviceAssignmentForm: React.FC<DeviceAssignmentFormProps> = ({ onClose, on
     }
   };
 
-  const handleMachineDetailChange = (index: number, field: 'id' | 'loca' | 'longitude'|'latitude', value: string) => {
+  const handleMachineDetailChange = (index: number, field: 'id' | 'loca' |'longitude'|'latitude', value: string) => {
     const updated = [...formData.machineDetails];
     updated[index][field] = value;
     setFormData(prev => ({ ...prev, machineDetails: updated }));
@@ -88,7 +87,6 @@ const DeviceAssignmentForm: React.FC<DeviceAssignmentFormProps> = ({ onClose, on
       numberOfMachines: formData.numberOfMachines,
       machineIds: fullIds,
       loca: formData.machineDetails.map(m => m.loca),
-   
       longitude:formData.machineDetails.map(m => m.longitude),
       latitude: formData.machineDetails.map(m => m.latitude)
     };
@@ -128,7 +126,7 @@ const DeviceAssignmentForm: React.FC<DeviceAssignmentFormProps> = ({ onClose, on
     formData.numberOfMachines > 0;
 
   const isStep2Valid =
-    formData.machineDetails.every(d => d.id.trim() !== '' ) &&
+    formData.machineDetails.every(d => d.id.trim() !== '') &&
     formData.machineDetails.length === formData.numberOfMachines;
 
   return (

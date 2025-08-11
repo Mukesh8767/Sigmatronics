@@ -4,7 +4,6 @@ import { useDevicesBySolution } from "../../hooks/useUserDeviceSolutions";
 import {
   MapPin,
   Gauge,
-  TrendingUp,
   Calendar,
   Eye,
   Check,
@@ -13,14 +12,14 @@ import SolutionCardSkeleton from "../../components/SolutionLoader";
 import { formatUpdatedAt } from "../../components/tables/MachineOverviewTable";
 import { Button } from "../../components/button";
 import { Back } from "../../components/BackButton";
+import { encodeBase64 } from "../../../utils/base64";
+import { transformMachineCode } from "../../components/machineCodeEncoder";
 
 export const AnalysisMachineView = () => {
   const { userId, solution } = useParams();
   const navigate = useNavigate();
   const { devices, loading, error } = useDevicesBySolution(userId || "", solution || "");
-  // console.log(devices[0].machineId)
-  console.log(atob("ASQ1001"))
-  console.log(btoa("%01%04µÓM"))
+
   const StatusBadge = ({ status }: { status: string }) => {
     const active = status === "active";
     return (
@@ -40,30 +39,19 @@ export const AnalysisMachineView = () => {
   };
 
   const TableView = () => (
-     <div className="border border-gray-200 rounded-lg overflow-x-auto">
+    <div className="border border-gray-200 rounded-lg overflow-x-auto">
       <table className="w-full text-sm text-gray-700">
         <thead className="bg-gray-100 text-gray-600 text-xs uppercase tracking-wide font-medium">
           <tr>
-             <th className="px-4 py-2 text-left">#</th>
-          <th className="px-4 py-2 text-left">
-         <div className="flex items-center gap-1">
-        <Gauge className="w-4 h-4" /> Machine ID
-       </div>
-         </th>
-         
+            <th className="px-4 py-2 text-left">#</th>
+            <th className="px-4 py-2 text-left">
+              <div className="flex items-center gap-1">
+                <Gauge className="w-4 h-4" /> Machine ID
+              </div>
+            </th>
             <th className="px-4 py-2 text-left">
               <div className="flex items-center gap-1">
                 <MapPin className="w-4 h-4" /> Location
-              </div>
-            </th>
-            <th className="px-4 py-2 text-left">
-              <div className="flex items-center gap-1">
-                <Gauge className="w-4 h-4" /> Capacity
-              </div>
-            </th>
-            <th className="px-4 py-2 text-left">
-              <div className="flex items-center gap-1">
-                <TrendingUp className="w-4 h-4" /> Threshold
               </div>
             </th>
             <th className="px-4 py-2 text-left">
@@ -76,13 +64,6 @@ export const AnalysisMachineView = () => {
                 <Calendar className="w-4 h-4" /> Created
               </div>
             </th>
-            {/* Optional device type column:
-            <th className="px-4 py-2 text-left">
-              <div className="flex items-center gap-1">
-                <Package className="w-4 h-4" /> Type
-              </div>
-            </th>
-            */}
             <th className="px-4 py-2 text-left">Action</th>
           </tr>
         </thead>
@@ -91,26 +72,18 @@ export const AnalysisMachineView = () => {
             <tr key={device._id} className="hover:bg-gray-50 transition-colors">
               <td className="px-4 py-2 font-semibold text-blue-600">{i + 1}</td>
               <td className="px-4 py-2 font-mono">
-  {`${device.loca || "LOC"}_${device.machineId?.substring(4, 8) || "---"}`}
-</td>
-
-              <td className="px-4 py-2 font-medium">{device.loca || "Unknown"}</td>
-              <td className="px-4 py-2">{device.capacity || "—"}</td>
-              <td className="px-4 py-2">
-                {device.threshold !== undefined ? `${device.threshold}%` : "—"}
+                {transformMachineCode(device.machineId)}
               </td>
+              <td className="px-4 py-2 font-medium">{device.loca || "Unknown"}</td>
               <td className="px-4 py-2">
                 <StatusBadge status={device.status || "unknown"} />
               </td>
               <td className="px-4 py-2 text-gray-500">
                 {device.createdAt ? formatUpdatedAt(device.createdAt) : "—"}
               </td>
-              {/* Optional:
-              <td className="px-4 py-2">{device.type || "—"}</td>
-              */}
               <td className="px-4 py-2">
                 <Button
-                  onClick={() => navigate(`${btoa(device.machineId)}`)}                  
+                  onClick={() => navigate(`${encodeBase64(device.machineId)}`)}
                   variant="secondary"
                   className="text-blue-600 hover:text-blue-800 gap-1 flex items-center"
                 >
@@ -145,7 +118,7 @@ export const AnalysisMachineView = () => {
           </div>
         </div>
         <Button
-          onClick={() => navigate(`${atob(device.machineId)}`)}
+          onClick={() => navigate(`${encodeBase64(device.machineId)}`)}
           size="sm"
           variant="outline"
           className="text-blue-600 px-2 py-1 flex items-center gap-1"
@@ -153,15 +126,8 @@ export const AnalysisMachineView = () => {
           <Eye className="w-4 h-4" /> View
         </Button>
       </div>
-      <div className="grid grid-cols-2 gap-2 text-xs text-gray-700">
+      <div className="grid grid-cols-1 gap-2 text-xs text-gray-700">
         <div className="flex items-center gap-1">
-          <Gauge className="w-4 h-4 text-gray-400" /> {device.capacity || "—"}
-        </div>
-        <div className="flex items-center gap-1">
-          <TrendingUp className="w-4 h-4 text-gray-400" />{" "}
-          {device.threshold !== undefined ? `${device.threshold}%` : "—"}
-        </div>
-        <div className="col-span-2 flex items-center gap-1">
           <Calendar className="w-4 h-4 text-gray-400" />{" "}
           {device.createdAt ? formatUpdatedAt(device.createdAt) : "—"}
         </div>

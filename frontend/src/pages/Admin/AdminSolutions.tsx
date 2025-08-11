@@ -6,6 +6,7 @@ import { Button } from "../../components/button";
 import { useSolutions } from "../../hooks/useFetchSolutions";
 import { useState } from "react";
 import SolutionCardSkeleton from "../../components/SolutionLoader";
+import { transformSolutionCode } from "../../components/solutionCodeEncode";
 
 export function AdminSolution() {
   const {
@@ -105,7 +106,8 @@ export function AdminSolution() {
                 </h2>
                 <p className="text-sm text-slate-500 mb-2">{solution.description}</p>
                 <p className="text-xs text-slate-400 mb-3">
-                  Code: <span className="font-mono text-slate-600">{solution.code}</span>
+                  <div>Code: <span className="font-mono text-slate-600">{solution.code}</span></div>
+                  <div>Display Code: <span className="font-mono text-slate-600">{transformSolutionCode(solution.code)}</span></div>
                 </p>
 
                 <div>

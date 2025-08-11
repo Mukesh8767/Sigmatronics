@@ -12,6 +12,7 @@ import { formatUpdatedAt } from '../../components/tables/MachineOverviewTable';
 import AlertSkeleton from '../../components/DeviceLoader';
 import UserWrapper from '../Wrappers/UserWrapper';
 import { Button } from '../../components/button';
+import { transformMachineCode } from '../../components/machineCodeEncoder';
 
 export const Anamoly = () => {
   const { alerts = [], loading, error } = useFetchLiveAlerts();
@@ -53,7 +54,7 @@ export const Anamoly = () => {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-900">
-                {alert.message}
+                {transformMachineCode(alert.machineId)} : {alert.message}
               </p>
               <div className="flex items-center text-xs text-gray-500 mt-1 gap-2">
                 <span className="flex items-center gap-1">
