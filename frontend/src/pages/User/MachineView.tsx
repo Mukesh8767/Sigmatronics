@@ -12,6 +12,7 @@ import SolutionCardSkeleton from "../../components/SolutionLoader";
 import { formatUpdatedAt } from "../../components/tables/MachineOverviewTable";
 import { Button } from "../../components/button";
 import axiosInstance from "../../../utils/axiosInstance";
+import { transformMachineCode } from "../../components/machineCodeEncoder";
 
 export const MachineView = () => {
   const { userId, solution } = useParams();
@@ -113,7 +114,7 @@ export const MachineView = () => {
                     onClick={() => navigate(btoa(d.machineId))}
                   >
                     <td className="px-4 py-3 font-semibold">{idx + 1}</td>
-                    <td className="px-4 py-3">{`${d.loca || "LOC"}_${d.machineId?.substring(4, 8) || "---"}`}</td>
+                    <td className="px-4 py-3">{transformMachineCode(d.machineId)}</td>
                     <td className="px-4 py-3">{d.loca || "–"}</td>
                     <td className="px-4 py-3">
                       {d.latitude !== undefined && d.longitude !== undefined
@@ -163,7 +164,7 @@ export const MachineView = () => {
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold">Edit Parameters</h3>
-                    <p className="text-gray-100 text-sm">{`${editDevice.loca || "LOC"}_${editDevice.machineId?.substring(4, 8) || "---"}`}</p>
+                    <p className="text-gray-100 text-sm">{transformMachineCode(editDevice.machineId)}</p>
                   </div>
                 </div>
                 <button onClick={() => setEditDevice(null)} className="p-2 hover:bg-white/20 rounded-lg">

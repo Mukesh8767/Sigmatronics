@@ -21,6 +21,7 @@ import UserWrapper from '../Wrappers/UserWrapper';
 import axiosInstance from '../../../utils/axiosInstance';
 import EditProfileForm from '../../components/EditProfileForm';
 import { formatUpdatedAt } from '../../components/tables/MachineOverviewTable';
+import { transformMachineCode } from '../../components/machineCodeEncoder';
 
 const ProfileSkeleton = () => (
   <div className="animate-pulse">
@@ -255,7 +256,7 @@ export const UserProfile: React.FC = () => {
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
                     <Monitor className="w-4 h-4 text-gray-500" />
-                    <span className="font-medium text-gray-900">  {`${machine.loca}_${machine.machineId.substring(4, 8)}`}</span>
+                    <span className="font-medium text-gray-900">{transformMachineCode(machine.machineId)}</span>
                   </label>
                 ))
               )}

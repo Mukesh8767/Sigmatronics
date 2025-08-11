@@ -14,6 +14,7 @@ import { formatUpdatedAt } from "../../components/tables/MachineOverviewTable";
 import { Button } from "../../components/button";
 import { Back } from "../../components/BackButton";
 import { encodeBase64 } from "../../../utils/base64"; // ✅ import here
+import { transformMachineCode } from "../../components/machineCodeEncoder";
 
 export const AnalysisMachineView = () => {
   const { userId, solution } = useParams();
@@ -82,7 +83,7 @@ export const AnalysisMachineView = () => {
             <tr key={device._id} className="hover:bg-gray-50 transition-colors">
               <td className="px-4 py-2 font-semibold text-blue-600">{i + 1}</td>
               <td className="px-4 py-2 font-mono">
-                {`${device.loca || "LOC"}_${device.machineId?.substring(4, 8) || "---"}`}
+                {transformMachineCode(device.machineId)}
               </td>
               <td className="px-4 py-2 font-medium">{device.loca || "Unknown"}</td>
               <td className="px-4 py-2">{device.capacity || "—"}</td>

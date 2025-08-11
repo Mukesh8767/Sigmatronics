@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom';
 interface Alert {
   message: string;
   createdAt: string; 
+  machineId:string;
 }
 
 export const useFetchLiveAlerts = () => {
@@ -31,6 +32,7 @@ export const useFetchLiveAlerts = () => {
         const extractedAlerts = data.alerts.map((alert: any) => ({
           message: alert.message,
           createdAt: alert.createdAt,
+          machineId:alert.machineId
         }));
 
         setAlerts(extractedAlerts);
