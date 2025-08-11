@@ -4,7 +4,6 @@ import { useDevicesBySolution } from "../../hooks/useUserDeviceSolutions";
 import {
   MapPin,
   Gauge,
-  TrendingUp,
   Calendar,
   Eye,
   Check,
@@ -13,7 +12,7 @@ import SolutionCardSkeleton from "../../components/SolutionLoader";
 import { formatUpdatedAt } from "../../components/tables/MachineOverviewTable";
 import { Button } from "../../components/button";
 import { Back } from "../../components/BackButton";
-import { encodeBase64 } from "../../../utils/base64"; // ✅ import here
+import { encodeBase64 } from "../../../utils/base64";
 import { transformMachineCode } from "../../components/machineCodeEncoder";
 
 export const AnalysisMachineView = () => {
@@ -57,16 +56,6 @@ export const AnalysisMachineView = () => {
             </th>
             <th className="px-4 py-2 text-left">
               <div className="flex items-center gap-1">
-                <Gauge className="w-4 h-4" /> Capacity
-              </div>
-            </th>
-            <th className="px-4 py-2 text-left">
-              <div className="flex items-center gap-1">
-                <TrendingUp className="w-4 h-4" /> Threshold
-              </div>
-            </th>
-            <th className="px-4 py-2 text-left">
-              <div className="flex items-center gap-1">
                 <Check className="w-4 h-4" /> Status
               </div>
             </th>
@@ -86,10 +75,6 @@ export const AnalysisMachineView = () => {
                 {transformMachineCode(device.machineId)}
               </td>
               <td className="px-4 py-2 font-medium">{device.loca || "Unknown"}</td>
-              <td className="px-4 py-2">{device.capacity || "—"}</td>
-              <td className="px-4 py-2">
-                {device.threshold !== undefined ? `${device.threshold}%` : "—"}
-              </td>
               <td className="px-4 py-2">
                 <StatusBadge status={device.status || "unknown"} />
               </td>
@@ -141,15 +126,8 @@ export const AnalysisMachineView = () => {
           <Eye className="w-4 h-4" /> View
         </Button>
       </div>
-      <div className="grid grid-cols-2 gap-2 text-xs text-gray-700">
+      <div className="grid grid-cols-1 gap-2 text-xs text-gray-700">
         <div className="flex items-center gap-1">
-          <Gauge className="w-4 h-4 text-gray-400" /> {device.capacity || "—"}
-        </div>
-        <div className="flex items-center gap-1">
-          <TrendingUp className="w-4 h-4 text-gray-400" />{" "}
-          {device.threshold !== undefined ? `${device.threshold}%` : "—"}
-        </div>
-        <div className="col-span-2 flex items-center gap-1">
           <Calendar className="w-4 h-4 text-gray-400" />{" "}
           {device.createdAt ? formatUpdatedAt(device.createdAt) : "—"}
         </div>
