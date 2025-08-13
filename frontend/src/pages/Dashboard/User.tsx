@@ -12,7 +12,7 @@ import {
   TrendingUp,
   Clock,
   Bell,
-  Settings,
+
   Filter,
   RefreshCw,
 } from "lucide-react";
@@ -191,9 +191,7 @@ export function UserDashboard() {
                     </div>
                   )}
                 </button>
-                <button className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-                  <Settings size={20} className="text-gray-700" />
-                </button>
+                
               </div>
             </div>
           </div>

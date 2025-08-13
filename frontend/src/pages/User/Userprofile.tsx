@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from "react-toastify";
 import { 
   Trash2, 
   UserCircle, 
@@ -22,7 +23,12 @@ import axiosInstance from '../../../utils/axiosInstance';
 import EditProfileForm from '../../components/EditProfileForm';
 import { formatUpdatedAt } from '../../components/tables/MachineOverviewTable';
 import { transformMachineCode } from '../../components/machineCodeEncoder';
-
+type Device = {
+  machineId: string;
+  
+  name?: string;
+  status?: string;
+};
 const ProfileSkeleton = () => (
   <div className="animate-pulse">
     <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 mb-8">
@@ -180,8 +186,23 @@ export const UserProfile: React.FC = () => {
     }
   };
   //@ts-ignore
-  const SubUserCard = ({ subUser }) => (
+  const SubUserCard = ({ subUser }) => {
+  const handleDeleteMachine = async (machineId:string) => {
+    try {
+      await axiosInstance.delete(`api/device/deletedevices/${machineId}/subusers`, {
+        data: { subuserId: subUser._id },
+      });
+      // Optional: trigger parent refresh to update UI
+      toast.success(`Machine ${machineId} removed from ${subUser.name}`);
+      window.location.reload();
+    } catch (err) {
+      toast.error("Failed to remove machine.");
+    }
+  };
+
+  return (
     <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 group">
+      {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -192,17 +213,8 @@ export const UserProfile: React.FC = () => {
               <CheckCircle2 className="w-3 h-3 text-white" />
             </div>
           </div>
-          
           <div>
             <h4 className="font-semibold text-gray-900 text-lg">{subUser.name}</h4>
-            <div className="flex items-center gap-2 text-gray-600 text-sm mb-1">
-              <Mail className="w-4 h-4" />
-              <span>{subUser.email}</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-500 text-xs">
-              <Calendar className="w-3 h-3" />
-              <span>Added {formatUpdatedAt(subUser.createdAt)}</span>
-            </div>
           </div>
         </div>
 
@@ -215,6 +227,34 @@ export const UserProfile: React.FC = () => {
         </button>
       </div>
 
+      {/* List of Assigned Machines */}
+      {subUser.devices?.length > 0 && (
+        <div className="mb-4">
+          <h5 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
+            <Monitor className="w-4 h-4 text-blue-600" />
+            Assigned Machines
+          </h5>
+          <ul className="space-y-2">
+            {subUser.devices.map((device:Device) => (
+              <li
+                key={device.machineId}
+                className="flex items-center justify-between p-2 bg-gray-50 rounded-lg border border-gray-200"
+              >
+                <span className="font-medium text-gray-800">{device.machineId}</span>
+                <button
+                  onClick={() => handleDeleteMachine(device.machineId)}
+                  className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-all"
+                  title="Remove Machine"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Assign Machines Section */}
       <div className="border-t border-gray-100 pt-4">
         <button
           className="flex items-center justify-between w-full text-left p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"
@@ -226,10 +266,10 @@ export const UserProfile: React.FC = () => {
             <Monitor className="w-5 h-5 text-gray-600" />
             <span className="font-medium text-gray-900">Manage Machine Access</span>
           </div>
-          <ChevronDown 
+          <ChevronDown
             className={`w-5 h-5 text-gray-500 transition-transform ${
-              assignModeUserId === subUser._id ? 'rotate-180' : ''
-            }`} 
+              assignModeUserId === subUser._id ? "rotate-180" : ""
+            }`}
           />
         </button>
 
@@ -239,14 +279,14 @@ export const UserProfile: React.FC = () => {
               <Shield className="w-4 h-4 text-blue-600" />
               Assign Machine Access
             </h5>
-            
+
             <div className="space-y-3 max-h-48 overflow-y-auto mb-4">
               {userMachines.length === 0 ? (
                 <p className="text-gray-500 text-sm italic">No machines available</p>
               ) : (
                 userMachines.map((machine) => (
-                  <label 
-                    key={machine.machineId} 
+                  <label
+                    key={machine.machineId}
                     className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 cursor-pointer transition-colors"
                   >
                     <input
@@ -256,12 +296,14 @@ export const UserProfile: React.FC = () => {
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
                     <Monitor className="w-4 h-4 text-gray-500" />
-                    <span className="font-medium text-gray-900">{transformMachineCode(machine.machineId)}</span>
+                    <span className="font-medium text-gray-900">
+                      {transformMachineCode(machine.machineId)}
+                    </span>
                   </label>
                 ))
               )}
             </div>
-            
+
             <button
               className="w-full bg-blue-600 text-white font-medium py-2.5 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={() => handleAssignSubmit(subUser._id)}
@@ -274,6 +316,8 @@ export const UserProfile: React.FC = () => {
       </div>
     </div>
   );
+};
+
 
   return (
     <UserWrapper>

@@ -2,9 +2,17 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import type { IUser } from '../types';
 import axiosInstance from '../../utils/axiosInstance';
+type Device = {
+  machineId: string;
+  name?: string;
+  status?: string;
+};
+interface IUserWithDevices extends IUser {
+  devices?: Device[];
+}
 
 interface UseSubUsersResult {
-  subUsers: IUser[];
+  subUsers: IUserWithDevices[];
   totalUsers: number;
   totalPages: number;
   currentPage: number;
@@ -17,7 +25,7 @@ export const useSubUsers = (
   limit: number = 10,
   userId: string
 ): UseSubUsersResult => {
-  const [subUsers, setSubUsers] = useState<IUser[]>([]);
+  const [subUsers, setSubUsers] = useState<IUserWithDevices []>([]);
   const [totalUsers, setTotalUsers] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(page);

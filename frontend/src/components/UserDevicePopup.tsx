@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Wifi, WifiOff, Monitor, MapPin, Gauge, Calendar, Activity, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
+import { X, Wifi, WifiOff, Monitor, MapPin, Calendar, Activity, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
 import { useFetchDevice } from '../hooks/useFetchdevice';
 import { transformMachineCode } from './machineCodeEncoder';
 import { MachineAnalyticsComponent } from './MachineReadingComponent';
@@ -15,7 +15,7 @@ const UserDevicePopup: React.FC<PopupProps> = ({ isOpen, userId, onClose }) => {
   const [sortField, setSortField] = useState<string>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
-
+//@ts-ignore
   const handleViewData = (deviceId: string, machineId: string) => {
     setSelectedDevice(machineId);
   };

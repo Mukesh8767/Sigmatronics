@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import {
   Home,
-  Settings,
   LogOut,
   Monitor,
   Users,
