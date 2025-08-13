@@ -2,6 +2,7 @@ import { Cpu, Calendar, MapPin, Fingerprint, Trash2 } from "lucide-react";
 import { Button } from "../button";
 import axiosInstance from "../../../utils/axiosInstance";
 import { useState } from "react";
+import { transformMachineCode } from "../machineCodeEncoder";
 
 interface MachineEntry {
   _id: string;
@@ -80,7 +81,7 @@ const MachineAssignmentTable = ({
                   <div>
                     <h3 className="text-sm font-medium text-gray-900">
                       <div className="flex items-center gap-1">
-                        <Fingerprint className="w-4 h-4 mt-0.5" /> <span>{entry.machineId}</span>
+                        <Fingerprint className="w-4 h-4 mt-0.5" /> <span>{entry.machineId} | {transformMachineCode(entry.machineId)}</span>
                       </div>
                       Assigned To: {entry.assignedTo?.name}
                     </h3>
