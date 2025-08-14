@@ -5,29 +5,39 @@ interface SummaryCardProps {
   title: string;
   value: string | number;
   icon: LucideIcon;
-  color?: 'black' | "";
+  color?: 'blue' | 'green' | 'yellow' | 'purple';
   loading?: boolean;
+  className?: string;
 }
 
-type ColorKey = 'black' | '';
 
-const colorMap: Record<ColorKey, { text: string; bg?: string }> = {
-  black: { text: 'text-black' },
-  '': { text: '', bg: '' }
+const colorMap = {
+  blue: { bg: 'bg-blue-100', text: 'text-blue-600' },
+  green: { bg: 'bg-green-100', text: 'text-green-600' },
+  yellow: { bg: 'bg-yellow-100', text: 'text-yellow-600' },
+  purple: { bg: 'bg-purple-100', text: 'text-purple-600' },
 };
 
 const SummaryCard: React.FC<SummaryCardProps> = ({
-  title, value, icon: Icon, color = '', loading = false
+  title,
+  value,
+  icon: Icon,
+  color = 'blue',
+  loading = false,
 }) => {
-  const colors = colorMap[color] || { text: '', bg: '' };
+  const colors = colorMap[color] || colorMap.blue;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
       <div className="flex justify-between items-center">
         <div>
-          <p className="text-sm text-gray-600 mb-1">{title}</p>
-          <p className="text-2xl font-bold text-gray-900">
-            {loading ? <span className="animate-pulse bg-gray-200 h-8 w-16 block rounded"></span> : value}
+          <p className="text-sm font-medium text-gray-500">{title}</p>
+          <p className="mt-1 text-3xl font-bold text-gray-900">
+            {loading ? (
+              <span className="animate-pulse bg-gray-200 h-8 w-20 block rounded"></span>
+            ) : (
+              value
+            )}
           </p>
         </div>
         <div className={`p-3 rounded-lg ${colors.bg}`}>
