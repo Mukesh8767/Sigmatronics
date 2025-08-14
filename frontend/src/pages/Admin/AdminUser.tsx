@@ -34,8 +34,8 @@ export const AdminUsers = () => {
 
   const filteredUsers = users.filter((user: User) =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.phoneNumber?.toLowerCase().includes(searchTerm.toLowerCase())
+    user.email.toLowerCase().includes(searchTerm.toLowerCase()) 
+    
   );
 
   const handleDeleteUser = async (id: string) => {
