@@ -240,7 +240,7 @@ export const UserProfile: React.FC = () => {
                 key={device.machineId}
                 className="flex items-center justify-between p-2 bg-gray-50 rounded-lg border border-gray-200"
               >
-                <span className="font-medium text-gray-800">{device.machineId}</span>
+                <span className="font-medium text-gray-800">{transformMachineCode(device.machineId)}</span>
                 <button
                   onClick={() => handleDeleteMachine(device.machineId)}
                   className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-all"
