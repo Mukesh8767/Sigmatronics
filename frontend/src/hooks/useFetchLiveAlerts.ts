@@ -31,7 +31,6 @@ export const useFetchLiveAlerts = () => {
           `/api/alert/by-user/${userId}`
         );
 
-        console.log(res);
 
         if (!res.data || !Array.isArray(res.data.alerts)) {
           throw new Error("Invalid alerts response format");

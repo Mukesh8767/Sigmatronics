@@ -87,7 +87,6 @@ const AdminDashboard: React.FC = () => {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 3);
 
-    console.log(userCountMap);
 
   const recent = [...devices]
     .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))

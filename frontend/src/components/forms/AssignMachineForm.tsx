@@ -23,14 +23,12 @@ const DeviceAssignmentForm: React.FC<DeviceAssignmentFormProps> = ({ onClose, on
     numberOfMachines: 1,
     machineDetails: [{ id: '', loca: '', longitude: '', latitude: '' }]
   });
-  console.log(formData);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { users = [] } = useAllFetchRootUsers();
   const { solutions = [] } = useSolutions();
-  console.log(solutions);
 
   useEffect(() => {
     setFormData(prev => {

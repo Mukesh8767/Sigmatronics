@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Back } from "../../components/BackButton";
 import ReadingVisualizer from "../../components/ReadingVisualizer";
 import UserWrapper from "../Wrappers/UserWrapper";
-import { Calendar } from "lucide-react";
+import { Calendar, RefreshCcw } from "lucide-react";
 import DatePicker from "react-datepicker";
 import { format } from "date-fns";
 import axiosInstance from "../../../utils/axiosInstance";
@@ -10,23 +10,29 @@ import { useParams } from "react-router-dom";
 import { decodeBase64 } from "../../../utils/base64";
 import { transformMachineCode } from "../../components/machineCodeEncoder";
 
+type TransformedReading = {
+  reading: any;
+  createdAt: string;
+  timestamp: string;
+  solution: any;
+};
+
 export const DataVisualiser = () => {
   let { deviceName } = useParams();
-
   deviceName = decodeBase64((deviceName || "").toString());
-  console.log("Decoded device name:", deviceName);
 
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
   const [readings, setReadings] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Fetch available dates
   useEffect(() => {
     const fetchAvailableDates = async () => {
       try {
         const res = await axiosInstance(`/api/deviceReading/availableDays/${deviceName}`);
         const data = res.data;
-        console.log("Available dates:", data.dates);
         setAvailableDates(data.dates || []);
 
         if (data.dates.length > 0) {
@@ -43,6 +49,7 @@ export const DataVisualiser = () => {
     }
   }, [deviceName]);
 
+  // Fetch readings + polling
   useEffect(() => {
     const [from, to] = dateRange;
     if (!from || !to || !deviceName) return;
@@ -50,8 +57,13 @@ export const DataVisualiser = () => {
     const fromStr = format(from, "yyyy-MM-dd");
     const toStr = format(to, "yyyy-MM-dd");
 
-    const fetchReadings = async () => {
-      setIsLoading(true);
+    const fetchReadings = async (isFirstLoad = false) => {
+      if (isFirstLoad) {
+        setIsInitialLoading(true);
+      } else {
+        setIsRefreshing(true);
+      }
+
       try {
         const res = await axiosInstance(
           `/api/deviceReading/readings/by-date/${deviceName}?from=${fromStr}&to=${toStr}`
@@ -66,24 +78,31 @@ export const DataVisualiser = () => {
             reading: r.readings,
             createdAt: r.createdAt,
             timestamp: r.timestamp,
-            solution: solution,
+            solution,
           }));
 
-          setReadings(transformed);
-        } else {
-          setReadings([]);
+          // ✅ merge with previous readings
+          setReadings((prev) => {
+            const existingTimestamps = new Set(prev.map(r => r.timestamp));
+            const newOnes: TransformedReading[] = transformed.filter((r: TransformedReading) => !existingTimestamps.has(r.timestamp));
+            return [...prev, ...newOnes].sort(
+              (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+            );
+          });
         }
       } catch (error) {
         console.error("Error fetching readings:", error);
-        setReadings([]);
       } finally {
-        setIsLoading(false);
+        if (isFirstLoad) {
+          setIsInitialLoading(false);
+        } else {
+          setIsRefreshing(false);
+        }
       }
     };
 
-    fetchReadings();
-
-    const intervalId = setInterval(fetchReadings, 10000);
+    fetchReadings(true); // initial load
+    const intervalId = setInterval(() => fetchReadings(false), 10000); // polling
 
     return () => clearInterval(intervalId);
   }, [dateRange, deviceName]);
@@ -101,19 +120,17 @@ export const DataVisualiser = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="flex flex-col space-y-4">
               <Back />
-              
+
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">
-                    Machine Data Analysis
-                  </h1>
+                  <h1 className="text-2xl font-bold text-gray-900">Machine Data Analysis</h1>
                   {deviceName && (
                     <p className="text-sm text-gray-500 mt-1">
                       Device: {transformMachineCode(deviceName)}
                     </p>
                   )}
                 </div>
-                
+
                 {/* Date Range Picker */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
                   <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
@@ -143,8 +160,16 @@ export const DataVisualiser = () => {
 
         {/* Content Section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="bg-white rounded-lg shadow-sm border">
-            {isLoading ? (
+          <div className="bg-white rounded-lg shadow-sm border relative">
+            {/* small refreshing indicator */}
+            {isRefreshing && !isInitialLoading && (
+              <div className="absolute top-3 right-3 flex items-center text-gray-400 text-xs">
+                <RefreshCcw className="w-3 h-3 animate-spin mr-1" />
+                Refreshing
+              </div>
+            )}
+
+            {isInitialLoading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="flex items-center space-x-2 text-gray-500">
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent"></div>

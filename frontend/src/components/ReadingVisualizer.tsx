@@ -176,48 +176,65 @@ const ReadingVisualizer: React.FC<ReadingVisualizerProps> = ({ data }) => {
 
 
     // GEO
-    if (param.type === 'geo') {
-      const latlngs = data
-        .map((row) => row.reading.latitude && row.reading.longitude
-          ? ([row.reading.latitude, row.reading.longitude] as [number, number])
-          : null)
-        .filter(Boolean) as [number, number][];
+   if (param.type === "geo") {
+  const values = getValues(param.key); // gets either latitudes or longitudes depending on param.key
+  const latestValue = values[values.length - 1];
 
-      return (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition">
-          <div className="flex items-center gap-3 mb-4">
-            <div className={`w-12 h-12 bg-gradient-to-br ${colorClass} rounded-xl flex items-center justify-center`}>
-              <Icon className="w-6 h-6 text-white" />
-            </div>
-            <h4 className="font-semibold text-gray-900">{label}</h4>
-          </div>
-          {latlngs.length ? (
-            <MapContainer
-              center={latlngs[0]}
-              zoom={13}
-              style={{ height: '300px', width: '100%', borderRadius: '8px' }}
-              scrollWheelZoom={false}
-            >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              <Polyline positions={latlngs} color="blue" weight={3} />
-              {latlngs.map((pos, i) => (
-                <Marker key={i} position={pos}>
-                  <Popup>
-                    Point {i + 1} <br />
-                    {format(new Date(data[i].createdAt), 'MMM dd, HH:mm')}
-                  </Popup>
-                </Marker>
-              ))}
-            </MapContainer>
-          ) : (
-            <p className="text-sm text-gray-500">No GPS coordinates available</p>
-          )}
+  const latlngs = data
+    .map((row) =>
+      row.reading.latitude && row.reading.longitude
+        ? ([row.reading.latitude, row.reading.longitude] as [number, number])
+        : null
+    )
+    .filter(Boolean) as [number, number][];
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition">
+      <div className="flex items-center gap-3 mb-4">
+        <div
+          className={`w-12 h-12 bg-gradient-to-br ${colorClass} rounded-xl flex items-center justify-center`}
+        >
+          <Icon className="w-6 h-6 text-white" />
         </div>
-      );
-    }
+        <div>
+          {/* Label (Lat or Lng) */}
+          <h4 className="font-semibold text-gray-900">{label}</h4>
+
+          {/* Show only Lat OR Lng value depending on param */}
+          <div className="mt-1 text-sm text-gray-700 font-medium">
+            {latestValue ?? "-"}
+          </div>
+        </div>
+      </div>
+
+      {latlngs.length ? (
+        <MapContainer
+          center={latlngs[0]}
+          zoom={13}
+          style={{ height: "300px", width: "100%", borderRadius: "8px" }}
+          scrollWheelZoom={false}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <Polyline positions={latlngs} color="blue" weight={3} />
+          {latlngs.map((pos, i) => (
+            <Marker key={i} position={pos}>
+              <Popup>
+                Point {i + 1} <br />
+                {format(new Date(data[i].createdAt), "MMM dd, HH:mm")}
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
+      ) : (
+        <p className="text-sm text-gray-500">No GPS coordinates available</p>
+      )}
+    </div>
+  );
+}
+
 
     // BADGE
     if (param.type === 'badge') {
