@@ -102,7 +102,7 @@ export const DataVisualiser = () => {
     };
 
     fetchReadings(true); // initial load
-    const intervalId = setInterval(() => fetchReadings(false), 10000); // polling
+    const intervalId = setInterval(() => fetchReadings(false), 50000); // polling
 
     return () => clearInterval(intervalId);
   }, [dateRange, deviceName]);
