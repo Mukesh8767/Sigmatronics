@@ -32,8 +32,9 @@ export const AdminUsers = () => {
   const [viewUserId, setViewUserId] = useState<string | null>(null);
 
   const filteredUsers = users.filter((user: User) =>
-    [user.name, user.email, user.phoneNumber ?? ""]
-      .some((field) => field.toLowerCase().includes(searchTerm.toLowerCase()))
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase()) 
+    
   );
 
   const refreshUsers = () => {
