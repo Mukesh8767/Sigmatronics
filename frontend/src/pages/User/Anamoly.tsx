@@ -4,9 +4,11 @@ import {
   Clock,
   CheckCircle2,
   Zap,
-  Bell
+  Bell,
+  Filter,
+  Loader2
 } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useFetchLiveAlerts } from '../../hooks/useFetchLiveAlerts';
 import { formatUpdatedAt } from '../../components/tables/MachineOverviewTable';
 import AlertSkeleton from '../../components/DeviceLoader';
@@ -17,6 +19,7 @@ import { transformMachineCode } from '../../components/machineCodeEncoder';
 export const Anamoly = () => {
   const { alerts = [], loading, error } = useFetchLiveAlerts();
   const [selectedDate, setSelectedDate] = useState<string>(''); // Format: YYYY-MM-DD
+  const [selectedSeverity, setSelectedSeverity] = useState<string>('all');
 
   const isSameDate = (dateStr: string, selected: string): boolean => {
     const alertDate = new Date(dateStr);
@@ -28,27 +31,29 @@ export const Anamoly = () => {
     );
   };
 
-  const filteredAlerts = selectedDate
-    ? alerts.filter(alert => isSameDate(alert.createdAt, selectedDate))
-    : alerts;
+  const filteredAlerts = useMemo(() => {
+    return alerts.filter(alert => {
+      const matchesDate = selectedDate ? isSameDate(alert.createdAt, selectedDate) : true;
+      const matchesSeverity = selectedSeverity === 'all' ? true : (alert as any).severity === selectedSeverity;
+      return matchesDate && matchesSeverity;
+    });
+  }, [alerts, selectedDate, selectedSeverity]);
 
   const AlertCard = ({ alert }: { alert: any }) => {
     const isTodayAlert = isSameDate(alert.createdAt, new Date().toISOString());
 
     return (
       <div
-        className={`rounded-lg border p-4 shadow-sm transition-all ${
-          isTodayAlert
-            ? 'bg-blue-50 border-blue-300'
-            : 'bg-white border-gray-200'
-        }`}
+        className={`rounded-lg border p-4 shadow-sm transition-all ${isTodayAlert
+          ? 'bg-blue-50 border-blue-300'
+          : 'bg-white border-gray-200'
+          }`}
       >
         <div className="flex items-start justify-between">
           <div className="flex gap-3 items-start">
             <div
-              className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                isTodayAlert ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'
-              }`}
+              className={`w-10 h-10 rounded-lg flex items-center justify-center ${isTodayAlert ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'
+                }`}
             >
               <AlertTriangle className="w-5 h-5" />
             </div>
@@ -78,84 +83,142 @@ export const Anamoly = () => {
     icon: Icon,
     label,
     value,
-    color
   }: {
     icon: any;
     label: string;
     value: number;
-    color: string;
   }) => (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex items-center justify-between">
+    <div className="bg-white rounded-2xl p-5 shadow-sm border border-[#e5e7eb] flex items-center justify-between">
       <div>
-        <p className="text-sm font-medium text-gray-600">{label}</p>
-        <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
+        <p className="text-xs uppercase tracking-wide text-[#5f6b7a]">{label}</p>
+        <p className="text-3xl font-bold text-[#0f172a] mt-1">{value}</p>
       </div>
-      <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center`}>
-        <Icon className="w-6 h-6 text-white" />
+      <div className="w-12 h-12 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
+        <Icon className="w-6 h-6" />
       </div>
     </div>
   );
 
   return (
     <UserWrapper>
-      <div className="p-6 sm:p-8 max-w-5xl mx-auto space-y-8">
-        <header className="text-center space-y-2">
-          <div className="flex items-center  gap-3 mb-3">
-            <div className="w-14 h-14 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg">
-              <AlertTriangle className="text-white w-6 h-6" />
+      <div className="p-6 sm:p-8 max-w-6xl mx-auto space-y-8 bg-white">
+        <header className="flex flex-col gap-2 text-[#0f172a]">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-amber-500 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/30 text-white">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-sm text-slate-500">Realtime anomaly center</p>
+                <h1 className="text-2xl font-bold text-[#0f172a]">Alerts & Anomalies</h1>
+              </div>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">System Alerts</h1>
+            <div className="flex items-center gap-2 text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-600">
+              <Zap className="w-4 h-4 text-amber-500" />
+              <span>Live monitoring active</span>
+              {loading && <Loader2 className="w-4 h-4 animate-spin text-slate-400" />}
+            </div>
           </div>
-          <p className="text-sm text-gray-600 flex">
-            Live monitoring of anomalies, thresholds, and events in your system
+          <p className="text-sm text-slate-600">
+            Track anomalies per device with AWS-style clarity.
           </p>
         </header>
 
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Zap className="w-4 h-4" />
-            <span>Live monitoring active</span>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <Bell className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">Total Alerts</p>
+                <p className="text-2xl font-semibold text-slate-900">{alerts.length}</p>
+              </div>
+            </div>
           </div>
-
-          <div className="flex items-center gap-2">
-            <label htmlFor="date-filter" className="text-sm text-gray-600">
-              Filter by Date:
-            </label>
-            <input
-              type="date"
-              id="date-filter"
-              className="border border-gray-300 rounded-md px-3 py-1.5 text-sm"
-              value={selectedDate}
-              onChange={e => setSelectedDate(e.target.value)}
-            />
-            {selectedDate && (
-              <Button children={"Clear"} variant='secondary' onClick={() => setSelectedDate('')}/>
-            )}
+          <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">Filtered</p>
+                <p className="text-2xl font-semibold text-slate-900">{filteredAlerts.length}</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <Shield className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">Today</p>
+                <p className="text-2xl font-semibold text-slate-900">
+                  {alerts.filter(alert =>
+                    isSameDate(alert.createdAt, new Date().toISOString())
+                  ).length}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
-        {!loading && !error && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <StatsCard
-              icon={Zap}
-              label={selectedDate ? "Filtered Alerts" : "Today's Alerts"}
-              value={
-                selectedDate
-                  ? filteredAlerts.length
-                  : alerts.filter(alert =>
-                      isSameDate(alert.createdAt, new Date().toISOString())
-                    ).length
-              }
-              color="bg-blue-500"
-            />
-            <StatsCard
-              icon={Bell}
-              label="Total Alerts"
-              value={alerts.length}
-              color="bg-gray-500"
-            />
+        <div className="bg-white rounded-2xl shadow-sm border border-[#e5e7eb] p-6 space-y-4">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <p className="text-sm text-[#4b5563]">Filters</p>
+              <h3 className="text-lg font-semibold text-[#111827]">Refine alerts</h3>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2 text-sm text-[#4b5563]">
+                <Filter className="w-4 h-4" />
+                <span>Date</span>
+                <input
+                  type="date"
+                  className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:ring-2 focus:ring-[#2563eb] focus:border-[#2563eb]"
+                  value={selectedDate}
+                  onChange={e => setSelectedDate(e.target.value)}
+                />
+                {selectedDate && (
+                  <Button variant='secondary' onClick={() => setSelectedDate('')}>
+                    Clear
+                  </Button>
+                )}
+              </div>
+              <select
+                className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:ring-2 focus:ring-[#2563eb] focus:border-[#2563eb]"
+                value={selectedSeverity}
+                onChange={e => setSelectedSeverity(e.target.value)}
+              >
+                <option value="all">All severities</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
           </div>
-        )}
+
+          {!loading && !error && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <StatsCard
+                icon={Zap}
+                label="Live alerts"
+                value={filteredAlerts.length}
+              />
+              <StatsCard
+                icon={Bell}
+                label="Total alerts"
+                value={alerts.length}
+              />
+              <StatsCard
+                icon={Shield}
+                label="Healthy devices"
+                value={Math.max(0, alerts.length - filteredAlerts.length)}
+              />
+            </div>
+          )}
+        </div>
 
         {/* Loading */}
         {loading && <AlertSkeleton />}
@@ -195,7 +258,7 @@ export const Anamoly = () => {
         {/* Alerts */}
         {!loading && !error && filteredAlerts.length > 0 && (
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-xl font-semibold text-slate-900">
               Showing {filteredAlerts.length} Alert{filteredAlerts.length !== 1 ? 's' : ''}
             </h2>
             <div className="space-y-3">

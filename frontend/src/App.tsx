@@ -1,7 +1,7 @@
-import { Route, Routes, BrowserRouter as Router } from 'react-router-dom';
+import { Route, Routes, BrowserRouter as Router, Navigate } from 'react-router-dom';
 import './App.css';
 import LoginForm from './pages/Login/Login';
-import  ForgotPassword  from './pages/Login/ForgotPassword';
+import ForgotPassword from './pages/Login/ForgotPassword';
 import { UserDashboard } from './pages/Dashboard/User';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import { SubUserDashboard } from './pages/Dashboard/subUser';
@@ -11,16 +11,13 @@ import { AdminMachine } from './pages/Admin/AdminMachine';
 import { AdminUsers } from './pages/Admin/AdminUser';
 import { AdminSetting } from './pages/Admin/AdminSetting';
 import { UserProfile } from './pages/User/Userprofile';
-import { UserMachines } from './pages/User/UserMachines';
 import { AdminSolution } from './pages/Admin/AdminSolutions';
 import { ToastContainer } from 'react-toastify';
-import MachineView from './pages/User/MachineView';
 import 'react-toastify/dist/ReactToastify.css';
-import { MachineReadingAnalysis } from './pages/User/MachineReadingAnalysis';
-import { UserAnalytics } from './pages/User/Analytics';
-import { AnalysisMachineView } from './pages/User/AnalysisMachineView';
-import { DataVisualiser } from './pages/User/MachineDataVisualizer';
 import { Anamoly } from './pages/User/Anamoly';
+import { SolutionsPage } from './pages/User/SolutionsPage';
+import { MachinesListPage } from './pages/User/MachinesListPage';
+import { MachineDetailPage } from './pages/User/MachineDetailPage';
 
 function App() {
   return (
@@ -34,7 +31,7 @@ function App() {
             path='/user/:userId'
             element={
               <ProtectedRoute>
-                <UserDashboard />
+                <Navigate to="solutions" replace />
               </ProtectedRoute>
             }
           />
@@ -108,26 +105,43 @@ function App() {
               }
             />
             <Route
-              path='analytics'
+              path='solutions'
               element={
                 <ProtectedRoute>
-                  <UserAnalytics />
+                  <SolutionsPage />
                 </ProtectedRoute>
               }
             />
+            <Route path='solutions/:solution' element={
+              <ProtectedRoute>
+                <MachinesListPage />
+              </ProtectedRoute>
+            } />
+            <Route path='solutions/:solution/:deviceName' element={
+              <ProtectedRoute>
+                <MachineDetailPage />
+              </ProtectedRoute>
+            } />
             <Route path='anamoly' element={
               <ProtectedRoute>
                 <Anamoly />
               </ProtectedRoute>
             } />
+            {/* Legacy routes - keeping for backward compatibility */}
+            <Route
+              path='analytics'
+              element={
+                <ProtectedRoute>
+                  <SolutionsPage />
+                </ProtectedRoute>
+              }
+            />
             <Route path='analytics/:solution' element={<ProtectedRoute>
-              <AnalysisMachineView />
+              <MachinesListPage />
             </ProtectedRoute>} />
             <Route path='analytics/:solution/:deviceName' element={<ProtectedRoute>
-              <DataVisualiser />
+              <MachineDetailPage />
             </ProtectedRoute>} />
-
-
             <Route
               path='profile'
               element={
@@ -140,16 +154,13 @@ function App() {
               path='machines'
               element={
                 <ProtectedRoute>
-                  <UserMachines />
+                  <SolutionsPage />
                 </ProtectedRoute>
               }
             />
-            <Route path="machines" element={<ProtectedRoute><UserMachines /></ProtectedRoute>} />
-
-            <Route path="machines/:solution" element={<ProtectedRoute><MachineView /></ProtectedRoute>} />
-
+            <Route path="machines/:solution" element={<ProtectedRoute><MachinesListPage /></ProtectedRoute>} />
             <Route path='machines/:solution/:deviceName' element={<ProtectedRoute>
-              <MachineReadingAnalysis />
+              <MachineDetailPage />
             </ProtectedRoute>} />
 
           </Route>

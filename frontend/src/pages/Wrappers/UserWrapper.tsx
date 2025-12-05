@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
   Home,
-  Monitor,
   ChartColumnBig,
   ShieldAlert,
   LogOut,
@@ -20,14 +19,20 @@ const UserWrapper = ({ children }: { children: React.ReactNode }) => {
   const { userId } = useParams<{ userId: string }>();
 
   const navItems = [
-    { label: 'Home', icon: Home, path: `/user/${userId}/home` },
-    { label: 'Machines', icon: Monitor, path: `/user/${userId}/machines` },
-    { label: 'Analytics', icon: ChartColumnBig, path: `/user/${userId}/analytics` },
+    { label: 'Solutions', icon: ChartColumnBig, path: `/user/${userId}/solutions` },
+    { label: 'Overview', icon: Home, path: `/user/${userId}/home` },
     { label: 'Anomalies', icon: ShieldAlert, path: `/user/${userId}/anamoly` },
     { label: 'Profile', icon: User, path: `/user/${userId}/profile` },
   ];
 
-  const isActive = (path: string) => location.pathname.startsWith(path);
+  const isActive = (path: string) => {
+    // Special handling for solutions - also match machines routes for backward compatibility
+    if (path.includes('/solutions')) {
+      return location.pathname.startsWith(path) ||
+        location.pathname.includes('/machines');
+    }
+    return location.pathname.startsWith(path);
+  };
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -74,10 +79,9 @@ const UserWrapper = ({ children }: { children: React.ReactNode }) => {
                   onClick={() => navigate(path)}
                   className={`flex cursor-pointer items-center gap-3 px-3 py-2 rounded-lg transform transition-all duration-200 ease-out
                     hover:scale-105 hover:bg-white/10 hover:text-white
-                    ${
-                      isActive(path)
-                        ? 'bg-white/10 text-white font-medium border-l-4 border-white'
-                        : 'text-white/60'
+                    ${isActive(path)
+                      ? 'bg-white/10 text-white font-medium border-l-4 border-white'
+                      : 'text-white/60'
                     }
                   `}
                 >
@@ -108,9 +112,9 @@ const UserWrapper = ({ children }: { children: React.ReactNode }) => {
           <header className="flex justify-between items-center  px-4 py-3 shadow bg-black text-white border-b border-white/20">
             <span className="text-lg font-semibold">Sigmatronics</span>
             <LogOut onClick={() => {
-                localStorage.clear();
-                navigate('/');
-              }}/>
+              localStorage.clear();
+              navigate('/');
+            }} />
           </header>
         )}
         <main className="flex-1 overflow-auto bg-white  ">{children}</main>
@@ -121,9 +125,8 @@ const UserWrapper = ({ children }: { children: React.ReactNode }) => {
               <button
                 key={label}
                 onClick={() => navigate(path)}
-                className={`flex flex-col items-center text-xs transition transform duration-200 ${
-                  isActive(path) ? 'text-white' : 'text-white/50'
-                } hover:scale-110`}
+                className={`flex flex-col items-center text-xs transition transform duration-200 ${isActive(path) ? 'text-white' : 'text-white/50'
+                  } hover:scale-110`}
               >
                 <Icon size={20} />
               </button>

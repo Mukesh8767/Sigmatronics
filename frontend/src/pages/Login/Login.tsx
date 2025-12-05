@@ -29,7 +29,7 @@ const LoginForm: React.FC = () => {
       if (parent === userId) {
         navigate(`/admin/${userId}/home`);
       } else {
-        navigate(`/user/${userId}/home`);
+        navigate(`/user/${userId}/solutions`);
       }
     } catch (error: any) {
       const status = error?.response?.status;

@@ -10,12 +10,12 @@ import { useParams } from "react-router-dom";
 import { decodeBase64 } from "../../../utils/base64";
 import { transformMachineCode } from "../../components/machineCodeEncoder";
 
-type TransformedReading = {
-  reading: any;
-  createdAt: string;
-  timestamp: string;
-  solution: any;
-};
+// type TransformedReading = {
+//   reading: any;
+//   createdAt: string;
+//   timestamp: string;
+//   solution: any;
+// };
 
 export const DataVisualiser = () => {
   let { deviceName } = useParams();
@@ -25,6 +25,7 @@ export const DataVisualiser = () => {
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
   const [readings, setReadings] = useState<any[]>([]);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  //@ts-ignore
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Fetch available dates
@@ -50,62 +51,61 @@ export const DataVisualiser = () => {
   }, [deviceName]);
 
   // Fetch readings + polling
-  useEffect(() => {
-    const [from, to] = dateRange;
-    if (!from || !to || !deviceName) return;
+  // Fetch readings + silent polling (no chart flicker)
+useEffect(() => {
+  const [from, to] = dateRange;
+  if (!from || !to || !deviceName) return;
 
-    const fromStr = format(from, "yyyy-MM-dd");
-    const toStr = format(to, "yyyy-MM-dd");
+  const fromStr = format(from, "yyyy-MM-dd");
+  const toStr = format(to, "yyyy-MM-dd");
 
-    const fetchReadings = async (isFirstLoad = false) => {
-      if (isFirstLoad) {
-        setIsInitialLoading(true);
-      } else {
-        setIsRefreshing(true);
-      }
+  const fetchReadings = async (isFirstLoad = false) => {
+    if (isFirstLoad) setIsInitialLoading(true);
 
-      try {
-        const res = await axiosInstance(
-          `/api/deviceReading/readings/by-date/${deviceName}?from=${fromStr}&to=${toStr}`
+    try {
+      const res = await axiosInstance(
+        `/api/deviceReading/readings/by-date/${deviceName}?from=${fromStr}&to=${toStr}`
+      );
+
+      const data = res.data;
+      if (!data.readings || !data.solution) return;
+
+      const solution = data.solution;
+
+      const transformed = data.readings.map((r: any) => ({
+        reading: r.readings,
+        createdAt: r.createdAt,
+        timestamp: r.timestamp,
+        solution,
+      }));
+
+      // ONLY update if new readings exist
+      setReadings((prev) => {
+        const existing = new Set(prev.map((p) => p.timestamp));
+        const newItems = transformed.filter((r:any) => !existing.has(r.timestamp));
+
+        if (newItems.length === 0) return prev; // 🔥 no re-render → silent polling
+
+        return [...prev, ...newItems].sort(
+          (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
         );
+      });
+    } catch (error) {
+      console.error("Error fetching readings:", error);
+    } finally {
+      if (isFirstLoad) setIsInitialLoading(false);
+    }
+  };
 
-        const data = res.data;
+  fetchReadings(true); // initial load only
 
-        if (data.readings && data.readings.length > 0 && data.solution) {
-          const solution = data.solution;
+  const intervalId = setInterval(() => {
+    fetchReadings(false); // silent polling
+  }, 10000);
 
-          const transformed = data.readings.map((r: any) => ({
-            reading: r.readings,
-            createdAt: r.createdAt,
-            timestamp: r.timestamp,
-            solution,
-          }));
+  return () => clearInterval(intervalId);
+}, [dateRange, deviceName]);
 
-          // ✅ merge with previous readings
-          setReadings((prev) => {
-            const existingTimestamps = new Set(prev.map(r => r.timestamp));
-            const newOnes: TransformedReading[] = transformed.filter((r: TransformedReading) => !existingTimestamps.has(r.timestamp));
-            return [...prev, ...newOnes].sort(
-              (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-            );
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching readings:", error);
-      } finally {
-        if (isFirstLoad) {
-          setIsInitialLoading(false);
-        } else {
-          setIsRefreshing(false);
-        }
-      }
-    };
-
-    fetchReadings(true); // initial load
-    const intervalId = setInterval(() => fetchReadings(false), 10000); // polling
-
-    return () => clearInterval(intervalId);
-  }, [dateRange, deviceName]);
 
   const isDateAvailable = (date: Date) => {
     const str = format(date, "yyyy-MM-dd");
@@ -123,7 +123,7 @@ export const DataVisualiser = () => {
 
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Machine Data Analysis</h1>
+                  <h1 className="text-2xl font-bold text-gray-900">Machine Data Analysi</h1>
                   {deviceName && (
                     <p className="text-sm text-gray-500 mt-1">
                       Device: {transformMachineCode(deviceName)}
