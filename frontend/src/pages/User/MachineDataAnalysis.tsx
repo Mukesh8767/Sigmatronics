@@ -33,12 +33,16 @@ export const MachineDataAnalysis = () => {
 
       {!loading && !error && solutions.length > 0 && (
         <AnalysisSolutionTable
-          data={solutions.map((s) => ({
-            solutionType: s.solutionType,
-            freq: s.freq,
-            //@ts-ignore
-            solutionName: s.solutionName 
-          }))}
+          data={solutions.map((s) => {
+            const name =
+              s.solutionName ||
+              (s.solutionType ? atob(s.solutionType) : "Solution");
+            return {
+              solutionType: s.solutionType,
+              freq: s.freq,
+              solutionName: name,
+            };
+          })}
         />
       )}
 

@@ -1,4 +1,4 @@
-import { Cpu, Activity, TrendingUp, Zap, Settings, BarChart2, ChevronRight, Database } from "lucide-react";
+import { Activity, TrendingUp, Zap, Settings, BarChart2, ChevronRight, Database } from "lucide-react";
 import UserWrapper from "../Wrappers/UserWrapper";
 import { useUserDeviceSolutions } from "../../hooks/useUserDeviceSolutions";
 import { useParams, useNavigate } from "react-router-dom";
@@ -103,8 +103,9 @@ export const SolutionsPage = () => {
 
             {!loading && !error && solutions.length > 0 && (
               <div className="divide-y divide-[#e5e7eb]">
-                {solutions.map(({ solutionType, freq, solutionName }, index) => {
-                  const Icon = getSolutionIcon(solutionName);
+                {solutions.map(({ solutionType, freq, solutionName }) => {
+                  const displayName = solutionName || (solutionType ? atob(solutionType) : "Solution");
+                  const Icon = getSolutionIcon(displayName);
                   const coverage = totalMachines > 0 ? Math.round((freq / totalMachines) * 100) : 0;
 
                   return (
@@ -120,7 +121,7 @@ export const SolutionsPage = () => {
                           </div>
                           <div className="flex-1 min-w-0">
                             <h3 className="text-sm font-semibold text-[#16191f] group-hover:text-[#0073bb] transition-colors truncate">
-                              {solutionName}
+                              {displayName}
                             </h3>
                             <div className="flex items-center gap-3 mt-0.5">
                               <span className="text-xs text-[#545b64]">{freq} machine{freq !== 1 ? 's' : ''}</span>

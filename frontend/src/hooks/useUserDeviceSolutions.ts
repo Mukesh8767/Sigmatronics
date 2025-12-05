@@ -4,6 +4,7 @@ import axiosInstance from "../../utils/axiosInstance";
 interface DeviceSolution {
   solutionType: string;
   freq: number;
+  solutionName?: string;
 }
 // interface ParameterType {
 //   key: string;
@@ -50,8 +51,8 @@ export type DeviceType = {
   _id: string;
   machineId: string;
   loca: string;
-  latitude?: number;     
-  longitude?: number;   
+  latitude?: number;
+  longitude?: number;
   status: string;
   createdAt: string;
   parameters?: Array<{
