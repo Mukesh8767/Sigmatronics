@@ -1,4 +1,4 @@
-import { Cpu, Activity, TrendingUp, Zap, Settings, BarChart2, ChevronRight, Database } from "lucide-react";
+import { Activity, TrendingUp, Zap, Settings, BarChart2, ChevronRight, Database } from "lucide-react";
 import UserWrapper from "../Wrappers/UserWrapper";
 import { useUserDeviceSolutions } from "../../hooks/useUserDeviceSolutions";
 import { useParams, useNavigate } from "react-router-dom";
