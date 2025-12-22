@@ -3,7 +3,7 @@ import AdminWrapper from "../Wrappers/AdminWrapper";
 import {
   Users,
   Monitor,
-  Award,
+  
   TrendingUp,
   Clock,
   Activity,
@@ -65,8 +65,7 @@ const AdminDashboard: React.FC = () => {
     return acc;
   }, {} as Record<string, number>);
 
-  const mostPopular =
-    Object.entries(solutionCount).sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
+  
 
   const activeDevices = devices.filter((d) => d.status === "active").length;
   const totalSolutions = Object.keys(solutionCount).length;
