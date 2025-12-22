@@ -176,7 +176,7 @@ export const MachineDetailPage = () => {
               className="flex items-center gap-1.5 text-sm text-[#0073bb] hover:text-[#005a8c] mb-3 transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              Back to machines
+              Back to Devices
             </button>
 
             {/* Header Content */}
@@ -185,10 +185,10 @@ export const MachineDetailPage = () => {
                 <h1 className="text-xl font-semibold text-[#16191f] mb-1 flex items-center gap-1">
                   <NotepadText />
                   {viewMode === "readings"
-                    ? "Machine Readings"
+                    ? "Device Readings"
                     : viewMode === "analytics"
-                      ? "Machine Analytics"
-                      : "Machine Alerts"}
+                      ? "Device Analytics"
+                      : "Device Alerts"}
                 </h1>
                 {decodedDeviceName && (
                   <p className="text-sm text-[#545b64]">

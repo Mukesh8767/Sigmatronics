@@ -57,7 +57,7 @@ export const MachinesListPage = () => {
                         </button>
 
                         <div className="bg-white border border-[#d1d5db] rounded px-4 py-3 mb-4">
-                            <h1 className="text-2xl font-semibold text-[#16191f] mb-0.5">Machines</h1>
+                            <h1 className="text-2xl font-semibold text-[#16191f] mb-0.5">Devices</h1>
                             <p className="text-sm text-[#545b64]">
                                 Devices associated with this solution
                             </p>
@@ -69,7 +69,7 @@ export const MachinesListPage = () => {
                                 <div className="bg-white border border-[#d1d5db] rounded px-4 py-3">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <p className="text-xs text-[#545b64] font-medium mb-0.5">Total Machines</p>
+                                            <p className="text-xs text-[#545b64] font-medium mb-0.5">Total Devices</p>
                                             <p className="text-xl font-semibold text-[#16191f]">{devices.length}</p>
                                         </div>
                                         <div className="p-2 bg-[#f0f5ff] rounded">
@@ -142,7 +142,7 @@ export const MachinesListPage = () => {
                                     <thead className="bg-[#f9fafb] border-b border-[#d1d5db]">
                                         <tr>
                                             <th className="px-4 py-2.5 text-left text-xs font-semibold text-[#545b64] uppercase tracking-wide">#</th>
-                                            <th className="px-4 py-2.5 text-left text-xs font-semibold text-[#545b64] uppercase tracking-wide">Machine ID</th>
+                                            <th className="px-4 py-2.5 text-left text-xs font-semibold text-[#545b64] uppercase tracking-wide">Device ID</th>
                                             <th className="px-4 py-2.5 text-left text-xs font-semibold text-[#545b64] uppercase tracking-wide">Location</th>
                                             <th className="px-4 py-2.5 text-left text-xs font-semibold text-[#545b64] uppercase tracking-wide">Status</th>
                                             <th className="px-4 py-2.5 text-left text-xs font-semibold text-[#545b64] uppercase tracking-wide">Created</th>

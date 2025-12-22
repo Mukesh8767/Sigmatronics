@@ -121,7 +121,7 @@ export const MachineReadingAnalysis = () => {
             <Back />
             <div className="mt-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 mb-1">Machine Reading Analysis</h1>
+                <h1 className="text-2xl font-bold text-gray-900 mb-1">Device Reading Analysis</h1>
                 <p className="text-gray-600 text-sm">Device ID: {transformMachineCode(deviceId)} | Real-time data monitoring and analysis</p>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full sm:w-auto">

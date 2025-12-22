@@ -60,7 +60,7 @@ export const AdminMachine = () => {
       <div className="p-4 md:p-6">
         <div className="flex flex-col md:flex-row justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-semibold">Manage and Assign Machines</h1>
+            <h1 className="text-2xl font-semibold">Manage and Assign Devices</h1>
             <p className="text-sm text-gray-500">
               Assign devices to users and manage existing ones.
             </p>

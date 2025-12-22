@@ -49,7 +49,7 @@ export const SolutionsPage = () => {
             <div className="bg-white border border-[#d1d5db] rounded px-4 py-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-[#545b64] font-medium mb-0.5">Total Machines</p>
+                  <p className="text-xs text-[#545b64] font-medium mb-0.5">Total Devices</p>
                   <p className="text-xl font-semibold text-[#16191f]">{totalMachines}</p>
                 </div>
                 <div className="p-2 bg-[#f0f5ff] rounded">
