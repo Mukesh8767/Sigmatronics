@@ -14,8 +14,6 @@ import {
     Search,
     Clock,
     Activity,
-    Bell,
-    BellOff,
     AlertTriangle
 } from "lucide-react";
 import { formatUpdatedAt } from "../../components/tables/MachineOverviewTable";
@@ -215,6 +213,7 @@ const DeviceEditModal = ({ device, onClose, onSuccess }: { device: any, onClose:
 export const MachinesListPage = () => {
     const { userId, solution } = useParams();
     const navigate = useNavigate();
+    //@ts-ignore
     const { devices, loading, error, refetch } = useDevicesBySolution(userId || "", solution || "");
     const [editingDevice, setEditingDevice] = useState<any>(null);
     const [searchTerm, setSearchTerm] = useState("");
