@@ -19,7 +19,7 @@ const AdminWrapper = ({ children }: { children: React.ReactNode }) => {
 
   const navItems = [
     { label: "Home", icon: Home, path: `/admin/${adminId}/home` },
-    { label: "Machines", icon: Monitor, path: `/admin/${adminId}/machines` },
+    { label: "Devices", icon: Monitor, path: `/admin/${adminId}/machines` },
     { label: "Solutions", icon: Puzzle, path: `/admin/${adminId}/solutions` },
     { label: "Users", icon: Users, path: `/admin/${adminId}/users` },
   ];

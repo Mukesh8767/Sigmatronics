@@ -3,7 +3,7 @@ import AdminWrapper from "../Wrappers/AdminWrapper";
 import {
   Users,
   Monitor,
-  Award,
+  
   TrendingUp,
   Clock,
   Activity,
@@ -65,8 +65,7 @@ const AdminDashboard: React.FC = () => {
     return acc;
   }, {} as Record<string, number>);
 
-  const mostPopular =
-    Object.entries(solutionCount).sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
+  
 
   const activeDevices = devices.filter((d) => d.status === "active").length;
   const totalSolutions = Object.keys(solutionCount).length;
@@ -99,6 +98,13 @@ const AdminDashboard: React.FC = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        <SummaryCard
+            title="Total Solutions"
+            value={totalSolutions}
+            icon={Layers}
+            loading={deviceLoading}
+            className="bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow hover:shadow-lg transition rounded-xl"
+          />
           <SummaryCard
             title="Total Users"
             value={users.length}
@@ -107,19 +113,13 @@ const AdminDashboard: React.FC = () => {
             className="bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow hover:shadow-lg transition rounded-xl"
           />
           <SummaryCard
-            title="Machines Allotted"
+            title="Devices Allotted"
             value={devices.length}
             icon={Monitor}
             loading={deviceLoading}
             className="bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow hover:shadow-lg transition rounded-xl"
           />
-          <SummaryCard
-            title="Popular Solution"
-            value={mostPopular}
-            icon={Award}
-            loading={deviceLoading}
-            className="bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow hover:shadow-lg transition rounded-xl"
-          />
+          
           <SummaryCard
             title="Active Devices"
             value={activeDevices}
@@ -127,13 +127,7 @@ const AdminDashboard: React.FC = () => {
             loading={deviceLoading}
             className="bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow hover:shadow-lg transition rounded-xl"
           />
-          <SummaryCard
-            title="Total Solutions"
-            value={totalSolutions}
-            icon={Layers}
-            loading={deviceLoading}
-            className="bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow hover:shadow-lg transition rounded-xl"
-          />
+          
         </div>
 
         {/* Charts */}

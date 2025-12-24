@@ -55,6 +55,7 @@ export const useFetchDevice = (userId:string): UseFetchDeviceReturn => {
           online: onlineCount,
           offline: offlineCount,
         });
+        console.log("deviceList",deviceList)
         setLoading(false);
       } catch (err: any) {
         setError(err?.message || 'Error fetching devices');

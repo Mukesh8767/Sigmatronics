@@ -2,14 +2,13 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import UserWrapper from "../Wrappers/UserWrapper";
 import ReadingVisualizer from "../../components/ReadingVisualizer";
-import { EnhancedAnalytics } from "../../components/EnhancedAnalytics";
-import { ArrowLeft, Activity, Calendar, RefreshCcw, Download, NotepadText, Bell, AlertTriangle, Shield } from "lucide-react";
+import { Readings } from "../../components/Readings";
+import { Activity, Calendar, RefreshCcw, Download, AlertTriangle, Shield, ChevronLeft } from "lucide-react";
 import { transformMachineCode } from "../../components/machineCodeEncoder";
 import { decodeBase64 } from "../../../utils/base64";
 import DatePicker from "react-datepicker";
 import { format } from "date-fns";
 import axiosInstance from "../../../utils/axiosInstance";
-import { Button } from "../../components/button";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import "react-datepicker/dist/react-datepicker.css";
@@ -43,7 +42,7 @@ export const MachineDetailPage = () => {
   const [isAnalyticsLoading, setIsAnalyticsLoading] = useState(false);
   const [selectedColumns, setSelectedColumns] = useState<Set<string>>(new Set());
 
-  // Fetch available dates for readings
+  // Fetch available dates
   useEffect(() => {
     if (!decodedDeviceName) return;
     const fetchAvailableDates = async () => {
@@ -62,10 +61,10 @@ export const MachineDetailPage = () => {
     fetchAvailableDates();
   }, [decodedDeviceName]);
 
-  // Fetch readings
+  // Fetch readings (Live Telemetry -> Now for Analytics Dashboard)
   useEffect(() => {
     const [from, to] = dateRange;
-    if (!from || !to || !decodedDeviceName || viewMode !== "readings") return;
+    if (!from || !to || !decodedDeviceName || viewMode !== "analytics") return;
 
     const fromStr = format(from, "yyyy-MM-dd");
     const toStr = format(to, "yyyy-MM-dd");
@@ -105,10 +104,10 @@ export const MachineDetailPage = () => {
     return () => clearInterval(intervalId);
   }, [dateRange, decodedDeviceName, viewMode]);
 
-  // Fetch analytics data
+  // Fetch analytics data (Historical Log -> Now for Readings Tab)
   useEffect(() => {
     const [from, to] = dateRange;
-    if (!from || !to || !decodedDeviceName || viewMode !== "analytics") return;
+    if (!from || !to || !decodedDeviceName || viewMode !== "readings") return;
 
     const fetchAnalytics = async () => {
       setIsAnalyticsLoading(true);
@@ -166,204 +165,176 @@ export const MachineDetailPage = () => {
 
   return (
     <UserWrapper>
-      <div className="min-h-screen bg-[#f9fafb]">
-        {/* Header */}
-        <div className="bg-white border-b border-[#d1d5db] sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            {/* Back Button */}
-            <button
-              onClick={() => navigate(`/user/${userId}/solutions/${solution}`)}
-              className="flex items-center gap-1.5 text-sm text-[#0073bb] hover:text-[#005a8c] mb-3 transition-colors"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              Back to machines
-            </button>
-
-            {/* Header Content */}
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-              <div>
-                <h1 className="text-xl font-semibold text-[#16191f] mb-1 flex items-center gap-1">
-                  <NotepadText />
-                  {viewMode === "readings"
-                    ? "Machine Readings"
-                    : viewMode === "analytics"
-                      ? "Machine Analytics"
-                      : "Machine Alerts"}
-                </h1>
-                {decodedDeviceName && (
-                  <p className="text-sm text-[#545b64]">
-                    Device: <span className="font-mono text-[#0073bb]">{transformMachineCode(decodedDeviceName)}</span>
-                  </p>
-                )}
-              </div>
-
-              {/* View Mode Toggle */}
-              <div className="flex items-center gap-1 bg-[#f9fafb] border border-[#d1d5db] rounded p-1">
-                <button
-                  onClick={() => setViewMode("readings")}
-                  className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded transition-colors ${viewMode === "readings"
-                    ? "bg-white text-[#16191f] shadow-sm border border-[#d1d5db]"
-                    : "text-[#545b64] hover:text-[#16191f]"
-                    }`}
-                >
-                  <Activity className="w-4 h-4" />
-                  Readings
-                </button>
-                <button
-                  onClick={() => setViewMode("analytics")}
-                  className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded transition-colors ${viewMode === "analytics"
-                    ? "bg-white text-[#16191f] shadow-sm border border-[#d1d5db]"
-                    : "text-[#545b64] hover:text-[#16191f]"
-                    }`}
-                >
-                  <NotepadText className="w-4 h-4" />
-                  Analytics
-                </button>
-                <button
-                  onClick={() => setViewMode("alerts")}
-                  className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded transition-colors ${viewMode === "alerts"
-                    ? "bg-white text-[#16191f] shadow-sm border border-[#d1d5db]"
-                    : "text-[#545b64] hover:text-[#16191f]"
-                    }`}
-                >
-                  <Bell className="w-4 h-4" />
-                  Alerts
-                </button>
-              </div>
+      <div className="min-h-screen bg-[#F5F5F7] dark:bg-black transition-colors duration-300 font-sans">
+        {/* Sticky Header with Glassmorphism */}
+        <div className="sticky top-0 z-50 bg-[#F5F5F7]/80 dark:bg-black/80 backdrop-blur-xl border-b border-[#E5E5EA] dark:border-[#1C1C1E]">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-4">
+            {/* Nav Row */}
+            <div className="flex items-center justify-between mb-4">
+              <button
+                onClick={() => navigate(`/user/${userId}/solutions/${solution}`)}
+                className="flex items-center gap-1 text-[#0071E3] hover:opacity-70 transition-opacity font-medium"
+              >
+                <ChevronLeft className="w-5 h-5" />
+                Back
+              </button>
             </div>
 
-            {/* Date Range Picker */}
-            <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-[#545b64]" />
-                <label className="text-sm font-medium text-[#545b64]">Date range:</label>
+            {/* Title & Controls */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight text-[#1D1D1F] dark:text-[#F5F5F7] mb-1">
+                  {decodedDeviceName ? transformMachineCode(decodedDeviceName) : "Machine Details"}
+                </h1>
+                <p className="text-[#86868B] dark:text-[#98989D] text-sm font-medium">
+                  {viewMode === "readings" ? "Telemetry Log" : viewMode === "analytics" ? "Live Dashboard" : "Alert History"}
+                </p>
               </div>
-              <div className="relative">
-                <DatePicker
-                  selectsRange
-                  startDate={dateRange[0]}
-                  endDate={dateRange[1]}
-                  onChange={(update) => setDateRange(update)}
-                  filterDate={isDateAvailable}
-                  maxDate={new Date()}
-                  isClearable={false}
-                  dateFormat="yyyy-MM-dd"
-                  placeholderText="Select date range"
-                  className="border border-[#d1d5db] rounded px-3 py-1.5 text-sm text-[#16191f] focus:outline-none focus:ring-1 focus:ring-[#0073bb] focus:border-[#0073bb] min-w-[240px]"
-                />
+
+              <div className="flex flex-col sm:flex-row items-center gap-4">
+                {/* Segmented Control */}
+                <div className="bg-[#E5E5EA] dark:bg-[#1C1C1E] p-1 rounded-lg flex items-center">
+                  {(["readings", "analytics", "alerts"] as const).map((mode) => (
+                    <button
+                      key={mode}
+                      onClick={() => setViewMode(mode)}
+                      className={`
+                            px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200
+                            ${viewMode === mode
+                          ? "bg-white dark:bg-[#636366] text-black dark:text-white shadow-sm"
+                          : "text-[#86868B] hover:text-black dark:hover:text-white"}
+                          `}
+                    >
+                      {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Date Picker Button styling wrapper */}
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                    <Calendar className="w-4 h-4 text-[#86868B]" />
+                  </div>
+                  <DatePicker
+                    selectsRange
+                    startDate={dateRange[0]}
+                    endDate={dateRange[1]}
+                    onChange={(update) => setDateRange(update)}
+                    filterDate={isDateAvailable}
+                    maxDate={new Date()}
+                    isClearable={false}
+                    dateFormat="MMM dd, yyyy"
+                    placeholderText="Select dates"
+                    className="pl-10 pr-4 py-2 bg-white dark:bg-[#1C1C1E] border border-[#E5E5EA] dark:border-[#2C2C2E] rounded-lg text-sm font-medium text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-none focus:ring-2 focus:ring-[#0071E3] w-[240px] shadow-sm hover:border-[#86868B] transition-colors"
+                  />
+                </div>
+
+                {viewMode === "readings" && (
+                  <button
+                    onClick={handleDownloadExcel}
+                    disabled={analyticsReadings.length === 0 || isAnalyticsLoading}
+                    className="bg-[#0071E3] hover:bg-[#0077ED] disabled:opacity-50 text-white p-2 rounded-lg shadow-sm transition-all"
+                    title="Export Data"
+                  >
+                    <Download className="w-5 h-5" />
+                  </button>
+                )}
               </div>
-              {viewMode === "analytics" && (
-                <Button
-                  onClick={handleDownloadExcel}
-                  disabled={analyticsReadings.length === 0 || isAnalyticsLoading}
-                  variant="secondary"
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-[#0073bb] hover:bg-[#f0f5ff] disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Download className="w-3.5 h-3.5" /> Export
-                </Button>
-              )}
             </div>
           </div>
         </div>
 
         {/* Content Area */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          {viewMode === "readings" ? (
-            <div className="bg-white border border-[#d1d5db] rounded relative">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8">
+          {viewMode === "analytics" ? (
+            <div className="animate-fade-in">
               {isRefreshing && !isInitialLoading && (
-                <div className="absolute top-3 right-3 flex items-center text-xs text-[#545b64] z-10 bg-white px-2 py-1 rounded border border-[#d1d5db]">
-                  <RefreshCcw className="w-3 h-3 animate-spin mr-1" />
-                  Refreshing
+                <div className="fixed top-24 right-8 z-50">
+                  <span className="flex items-center gap-2 px-3 py-1.5 bg-white/80 dark:bg-[#2C2C2E]/80 backdrop-blur text-xs font-medium text-[#86868B] rounded-full shadow-sm border border-[#E5E5EA] dark:border-[#3A3A3C]">
+                    <RefreshCcw className="w-3 h-3 animate-spin" /> Live Updating
+                  </span>
                 </div>
               )}
+
               {isInitialLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="flex items-center space-x-2 text-[#545b64]">
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-[#0073bb] border-t-transparent"></div>
-                    <span className="text-sm">Loading data...</span>
-                  </div>
+                <div className="flex flex-col items-center justify-center py-24 text-[#86868B]">
+                  <div className="w-8 h-8 border-2 border-[#0071E3] border-t-transparent rounded-full animate-spin mb-4" />
+                  <p className="text-sm font-medium">Loading telemetry...</p>
                 </div>
               ) : readings.length > 0 ? (
-                <div className="p-4">
-                  <ReadingVisualizer data={readings} />
-                </div>
+                <ReadingVisualizer data={readings} />
               ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-[#545b64]">
-                  <Calendar className="w-10 h-10 mb-3 text-[#9ca3af]" />
-                  <p className="text-sm font-medium">No data available for the selected date range</p>
-                  {availableDates.length > 0 && (
-                    <p className="text-xs mt-1 text-[#9ca3af]">
-                      Try selecting from available dates: {availableDates.slice(-3).join(", ")}
-                    </p>
-                  )}
+                <div className="flex flex-col items-center justify-center py-32 text-center">
+                  <div className="w-16 h-16 bg-[#E5E5EA] dark:bg-[#1C1C1E] rounded-full flex items-center justify-center mb-4">
+                    <Activity className="w-8 h-8 text-[#86868B]" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-[#1D1D1F] dark:text-white mb-2">No Telemetry Data</h3>
+                  <p className="text-[#86868B] max-w-sm">No readings found for this period. Try selecting a different date range.</p>
                 </div>
               )}
             </div>
-          ) : viewMode === "analytics" ? (
-            <EnhancedAnalytics
-              readings={analyticsReadings}
-              columns={columns}
-              selectedColumns={selectedColumns}
-              onColumnToggle={toggleColumnSelection}
-              dateRange={dateRange}
-              onDateRangeChange={setDateRange}
-              onExport={handleDownloadExcel}
-              isLoading={isAnalyticsLoading}
-            />
+          ) : viewMode === "readings" ? (
+            <div className="animate-fade-in">
+              <Readings
+                readings={analyticsReadings}
+                columns={columns}
+                selectedColumns={selectedColumns}
+                onColumnToggle={toggleColumnSelection}
+                dateRange={dateRange}
+                onDateRangeChange={setDateRange}
+                onExport={handleDownloadExcel}
+                isLoading={isAnalyticsLoading}
+              />
+            </div>
           ) : (
-            <div className="space-y-4">
-              <div className="bg-white border border-[#d1d5db] rounded-lg p-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[#f0f5ff] flex items-center justify-center text-[#0073bb]">
-                    <Shield className="w-5 h-5" />
+            <div className="animate-fade-in space-y-6">
+              <div className="bg-white dark:bg-[#1C1C1E] rounded-3xl p-6 shadow-sm border border-[#E5E5EA] dark:border-[#2C2C2E] flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center text-orange-600 dark:text-orange-400">
+                    <AlertTriangle className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-[#16191f]">Machine alerts</p>
-                    <p className="text-xs text-[#545b64]">
-                      {decodedDeviceName ? transformMachineCode(decodedDeviceName) : "Device"} · Live anomalies feed
-                    </p>
+                    <h3 className="text-lg font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">Security & Alerts</h3>
+                    <p className="text-[#86868B] text-sm">Real-time anomaly detection log</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-[#16191f]">{machineAlerts.length}</p>
-                  <p className="text-xs text-[#545b64]">total alerts</p>
+                  <p className="text-3xl font-bold text-[#1D1D1F] dark:text-[#F5F5F7]">{machineAlerts.length}</p>
+                  <p className="text-xs font-medium text-[#86868B] uppercase tracking-wide">Total Events</p>
                 </div>
               </div>
 
               {alertsLoading && (
-                <div className="bg-white border border-[#d1d5db] rounded-lg p-6 text-center text-[#545b64]">
-                  Loading alerts...
-                </div>
-              )}
-
-              {alertsError && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center text-red-700">
-                  Unable to load alerts: {alertsError}
-                </div>
+                <div className="text-center py-12 text-[#86868B]">Loading security log...</div>
               )}
 
               {!alertsLoading && !alertsError && machineAlerts.length === 0 && (
-                <div className="bg-gradient-to-r from-emerald-50 to-green-50 border border-green-200 rounded-lg p-8 text-center text-[#0b3b2e]">
-                  <Shield className="w-10 h-10 mx-auto mb-3" />
-                  <p className="text-lg font-semibold">No alerts detected</p>
-                  <p className="text-sm text-[#1f4f3f]">This machine is currently healthy.</p>
+                <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-[#1C1C1E] rounded-3xl border border-[#E5E5EA] dark:border-[#2C2C2E] text-center">
+                  <Shield className="w-12 h-12 text-green-500 mb-4" />
+                  <h3 className="text-lg font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">System Healthy</h3>
+                  <p className="text-[#86868B]">No anomalies detected in the selected timeframe.</p>
                 </div>
               )}
 
               {!alertsLoading && !alertsError && machineAlerts.length > 0 && (
-                <div className="space-y-3">
-                  {machineAlerts.map((alert) => (
+                <div className="space-y-4">
+                  {machineAlerts.map((alert, idx) => (
                     <div
-                      key={alert.createdAt + alert.message}
-                      className="bg-white border border-[#e5e7eb] rounded-lg p-4 shadow-sm flex items-start gap-3"
+                      key={idx}
+                      className="bg-white dark:bg-[#1C1C1E] p-5 rounded-2xl border border-[#E5E5EA] dark:border-[#2C2C2E] shadow-sm flex items-start gap-4 hover:shadow-md transition-shadow"
                     >
-                      <div className="w-9 h-9 rounded-lg bg-[#fef3c7] text-[#b45309] flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0">
                         <AlertTriangle className="w-5 h-5" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-semibold text-[#111827]">{alert.message}</p>
-                        <p className="text-xs text-[#6b7280] mt-1">
-                          {format(new Date(alert.createdAt), "PPpp")}
+                        <div className="flex justify-between items-start">
+                          <h4 className="font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">{alert.message}</h4>
+                          <span className="text-xs text-[#86868B] font-medium whitespace-nowrap ml-4">
+                            {format(new Date(alert.createdAt), "MMM dd, HH:mm")}
+                          </span>
+                        </div>
+                        <p className="text-[#86868B] text-sm mt-1">
+                          Detected anomaly in system patterns.
                         </p>
                       </div>
                     </div>
@@ -377,3 +348,4 @@ export const MachineDetailPage = () => {
     </UserWrapper>
   );
 };
+

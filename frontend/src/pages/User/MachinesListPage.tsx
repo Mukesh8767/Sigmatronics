@@ -3,16 +3,11 @@ import UserWrapper from "../Wrappers/UserWrapper";
 import { useDevicesBySolution } from "../../hooks/useUserDeviceSolutions";
 import {
     Gauge,
-    Calendar,
-    Eye,
     ArrowLeft,
-    Activity,
-    Database,
-    TrendingUp,
+    MapPin,
+    ChevronRight,
 } from "lucide-react";
-import SolutionCardSkeleton from "../../components/SolutionLoader";
 import { formatUpdatedAt } from "../../components/tables/MachineOverviewTable";
-import { Button } from "../../components/button";
 import { encodeBase64 } from "../../../utils/base64";
 import { transformMachineCode } from "../../components/machineCodeEncoder";
 
@@ -21,198 +16,149 @@ export const MachinesListPage = () => {
     const navigate = useNavigate();
     const { devices, loading, error } = useDevicesBySolution(userId || "", solution || "");
 
+    const activeMachines = devices.filter(d => d.status === "active").length;
+    const inactiveMachines = devices.filter(d => d.status !== "active").length;
+
     const StatusBadge = ({ status }: { status: string }) => {
         const active = status === "active";
         return (
             <span
-                className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded ${active
-                    ? "bg-[#d1fae5] text-[#065f46] border border-[#a7f3d0]"
-                    : "bg-[#fee2e2] text-[#991b1b] border border-[#fecaca]"
+                className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold rounded-full transition-colors ${active
+                    ? "bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400"
+                    : "bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400"
                     }`}
             >
-                <span
-                    className={`w-1.5 h-1.5 rounded-full ${active ? "bg-[#10b981]" : "bg-[#ef4444]"
-                        }`}
-                />
-                {status.charAt(0).toUpperCase() + status.slice(1)}
+                <span className={`w-1.5 h-1.5 rounded-full ${active ? "bg-green-500" : "bg-red-500"}`} />
+                {status ? status.charAt(0).toUpperCase() + status.slice(1) : "Unknown"}
             </span>
         );
     };
 
-    const activeMachines = devices.filter(d => d.status === "active").length;
-    const inactiveMachines = devices.filter(d => d.status !== "active").length;
-
     return (
         <UserWrapper>
-            <div className="min-h-screen bg-[#f9fafb]">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                    {/* Header */}
-                    <div className="mb-6">
+            <div className="min-h-screen bg-[#F5F5F7] dark:bg-black font-sans transition-colors duration-300">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    {/* Header Section */}
+                    <div className="flex flex-col gap-6 mb-8">
                         <button
                             onClick={() => navigate(`/user/${userId}/solutions`)}
-                            className="flex items-center gap-1.5 text-sm text-[#0073bb] hover:text-[#005a8c] mb-4 transition-colors"
+                            className="flex items-center gap-2 text-sm font-medium text-[#0071E3] hover:opacity-70 transition-opacity w-fit"
                         >
-                            <ArrowLeft className="w-3.5 h-3.5" />
+                            <ArrowLeft className="w-4 h-4" />
                             Back to solutions
                         </button>
 
-                        <div className="bg-white border border-[#d1d5db] rounded px-4 py-3 mb-4">
-                            <h1 className="text-2xl font-semibold text-[#16191f] mb-0.5">Machines</h1>
-                            <p className="text-sm text-[#545b64]">
-                                Devices associated with this solution
-                            </p>
-                        </div>
-
-                        {/* Stats Cards */}
-                        {!loading && devices.length > 0 && (
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                                <div className="bg-white border border-[#d1d5db] rounded px-4 py-3">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-xs text-[#545b64] font-medium mb-0.5">Total Machines</p>
-                                            <p className="text-xl font-semibold text-[#16191f]">{devices.length}</p>
-                                        </div>
-                                        <div className="p-2 bg-[#f0f5ff] rounded">
-                                            <Database className="w-4 h-4 text-[#0073bb]" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="bg-white border border-[#d1d5db] rounded px-4 py-3">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-xs text-[#545b64] font-medium mb-0.5">Active</p>
-                                            <p className="text-xl font-semibold text-[#10b981]">{activeMachines}</p>
-                                        </div>
-                                        <div className="p-2 bg-[#d1fae5] rounded">
-                                            <Activity className="w-4 h-4 text-[#10b981]" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="bg-white border border-[#d1d5db] rounded px-4 py-3">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-xs text-[#545b64] font-medium mb-0.5">Inactive</p>
-                                            <p className="text-xl font-semibold text-[#ef4444]">{inactiveMachines}</p>
-                                        </div>
-                                        <div className="p-2 bg-[#fee2e2] rounded">
-                                            <TrendingUp className="w-4 h-4 text-[#ef4444]" />
-                                        </div>
-                                    </div>
-                                </div>
+                        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+                            <div>
+                                <h1 className="text-3xl font-bold tracking-tight text-[#1D1D1F] dark:text-[#F5F5F7]">
+                                    Devices
+                                </h1>
+                                <p className="text-[#86868B] dark:text-[#98989D] font-medium mt-1">
+                                    Monitoring {solution} systems
+                                </p>
                             </div>
-                        )}
+
+                            {/* Summary Stats */}
+                            {!loading && devices.length > 0 && (
+                                <div className="flex gap-3">
+                                    <div className="px-4 py-2 bg-white dark:bg-[#1C1C1E] rounded-xl shadow-sm border border-[#E5E5EA] dark:border-[#2C2C2E] flex items-center gap-3">
+                                        <div className="w-2 h-2 rounded-full bg-green-500" />
+                                        <div>
+                                            <p className="text-[10px] uppercase font-bold text-[#86868B] tracking-wider">Active</p>
+                                            <p className="text-lg font-bold text-[#1D1D1F] dark:text-white leading-none">{activeMachines}</p>
+                                        </div>
+                                    </div>
+                                    <div className="px-4 py-2 bg-white dark:bg-[#1C1C1E] rounded-xl shadow-sm border border-[#E5E5EA] dark:border-[#2C2C2E] flex items-center gap-3">
+                                        <div className="w-2 h-2 rounded-full bg-red-500" />
+                                        <div>
+                                            <p className="text-[10px] uppercase font-bold text-[#86868B] tracking-wider">Inactive</p>
+                                            <p className="text-lg font-bold text-[#1D1D1F] dark:text-white leading-none">{inactiveMachines}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
-                    {loading && (
-                        <div className="bg-white border border-[#d1d5db] rounded p-6">
-                            <SolutionCardSkeleton />
+                    {/* Content */}
+                    {loading ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {[1, 2, 3, 4, 5, 6].map((i) => (
+                                <div key={i} className="h-48 bg-gray-200 dark:bg-[#1C1C1E] rounded-2xl animate-pulse" />
+                            ))}
                         </div>
-                    )}
-
-                    {error && (
-                        <div className="bg-[#fef2f2] border border-[#fecaca] text-[#991b1b] rounded px-4 py-3 text-sm">
-                            <p className="font-medium">Error loading devices</p>
-                            <p className="text-xs mt-1">{error}</p>
+                    ) : error ? (
+                        <div className="p-6 bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-900/30 text-center">
+                            <p className="text-red-600 dark:text-red-400 font-medium">{error}</p>
                         </div>
-                    )}
-
-                    {!loading && !error && devices.length === 0 && (
-                        <div className="bg-white border border-[#d1d5db] rounded p-12 text-center">
-                            <div className="w-12 h-12 bg-[#f0f5ff] rounded-lg flex items-center justify-center mx-auto mb-3">
-                                <Gauge className="w-6 h-6 text-[#0073bb]" />
+                    ) : devices.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-24 text-center bg-white dark:bg-[#1C1C1E] rounded-3xl border border-[#E5E5EA] dark:border-[#2C2C2E]">
+                            <div className="w-16 h-16 bg-[#F5F5F7] dark:bg-[#2C2C2E] rounded-full flex items-center justify-center mb-4">
+                                <Gauge className="w-8 h-8 text-[#86868B]" />
                             </div>
-                            <p className="text-sm font-semibold text-[#16191f] mb-1">No devices available</p>
-                            <p className="text-xs text-[#545b64]">No devices linked with this solution yet.</p>
+                            <h3 className="text-lg font-bold text-[#1D1D1F] dark:text-white">No devices found</h3>
+                            <p className="text-[#86868B] dark:text-[#98989D]">This solution doesn't have any devices yet.</p>
                         </div>
-                    )}
-
-                    {!loading && !error && devices.length > 0 && (
-                        <div className="bg-white border border-[#d1d5db] rounded">
-                            <div className="border-b border-[#d1d5db] px-4 py-2.5 bg-[#f9fafb]">
-                                <h2 className="text-sm font-semibold text-[#16191f]">
-                                    Devices ({devices.length})
-                                </h2>
-                            </div>
-
-                            {/* Desktop Table */}
-                            <div className="hidden lg:block overflow-x-auto">
-                                <table className="w-full text-sm">
-                                    <thead className="bg-[#f9fafb] border-b border-[#d1d5db]">
-                                        <tr>
-                                            <th className="px-4 py-2.5 text-left text-xs font-semibold text-[#545b64] uppercase tracking-wide">#</th>
-                                            <th className="px-4 py-2.5 text-left text-xs font-semibold text-[#545b64] uppercase tracking-wide">Machine ID</th>
-                                            <th className="px-4 py-2.5 text-left text-xs font-semibold text-[#545b64] uppercase tracking-wide">Location</th>
-                                            <th className="px-4 py-2.5 text-left text-xs font-semibold text-[#545b64] uppercase tracking-wide">Status</th>
-                                            <th className="px-4 py-2.5 text-left text-xs font-semibold text-[#545b64] uppercase tracking-wide">Created</th>
-                                            <th className="px-4 py-2.5 text-left text-xs font-semibold text-[#545b64] uppercase tracking-wide">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-[#e5e7eb]">
-                                        {devices.map((device, i) => (
-                                            <tr
-                                                key={device._id}
-                                                className="hover:bg-[#f9fafb] transition-colors cursor-pointer"
-                                                onClick={() => navigate(`/user/${userId}/solutions/${solution}/${encodeBase64(device.machineId)}`)}
-                                            >
-                                                <td className="px-4 py-3 font-semibold text-[#0073bb]">{i + 1}</td>
-                                                <td className="px-4 py-3 font-mono text-sm text-[#16191f]">
-                                                    {transformMachineCode(device.machineId)}
-                                                </td>
-                                                <td className="px-4 py-3 text-[#545b64]">{device.loca || "Unknown"}</td>
-                                                <td className="px-4 py-3">
-                                                    <StatusBadge status={device.status || "unknown"} />
-                                                </td>
-                                                <td className="px-4 py-3 text-xs text-[#545b64]">
-                                                    {device.createdAt ? formatUpdatedAt(device.createdAt) : "—"}
-                                                </td>
-                                                <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                                                    <Button
-                                                        onClick={() => navigate(`/user/${userId}/solutions/${solution}/${encodeBase64(device.machineId)}`)}
-                                                        variant="secondary"
-                                                        className="text-xs text-[#0073bb] hover:text-[#005a8c] hover:bg-[#f0f5ff] gap-1.5 flex items-center px-2 py-1"
-                                                    >
-                                                        <Eye className="w-3.5 h-3.5" /> View
-                                                    </Button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            {/* Mobile Cards */}
-                            <div className="lg:hidden divide-y divide-[#e5e7eb]">
-                                {devices.map((device, i) => (
-                                    <div
-                                        key={device._id}
-                                        className="px-4 py-3 hover:bg-[#f9fafb] transition-colors cursor-pointer"
-                                        onClick={() => navigate(`/user/${userId}/solutions/${solution}/${encodeBase64(device.machineId)}`)}
-                                    >
-                                        <div className="flex items-center justify-between mb-2">
-                                            <div className="flex items-center gap-2.5">
-                                                <div className="w-6 h-6 bg-[#f0f5ff] text-[#0073bb] text-xs flex items-center justify-center rounded font-semibold">
-                                                    {i + 1}
-                                                </div>
-                                                <div>
-                                                    <h3 className="text-sm font-semibold text-[#16191f]">
-                                                        {device.loca || "Unknown Location"}
-                                                    </h3>
-                                                    <p className="text-xs text-[#545b64] font-mono mt-0.5">
-                                                        {transformMachineCode(device.machineId)}
-                                                    </p>
-                                                </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                            {devices.map((device) => (
+                                <div
+                                    key={device._id}
+                                    onClick={() => navigate(`/user/${userId}/solutions/${solution}/${encodeBase64(device.machineId)}`)}
+                                    className="group bg-white dark:bg-[#1C1C1E] rounded-3xl border border-[#E5E5EA] dark:border-[#2C2C2E] p-5 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col justify-between"
+                                >
+                                    {/* Card Header */}
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div>
+                                            <h3 className="text-lg font-bold text-[#1D1D1F] dark:text-white group-hover:text-[#0071E3] transition-colors">
+                                                {transformMachineCode(device.machineId)}
+                                            </h3>
+                                            <div className="flex items-center gap-2 mt-1 text-xs font-medium text-[#86868B] dark:text-[#98989D]">
+                                                {device.loca ? (
+                                                    <span className="flex items-center gap-1">
+                                                        <MapPin className="w-3 h-3" /> {device.loca}
+                                                    </span>
+                                                ) : (
+                                                    <span className="italic">No location</span>
+                                                )}
+                                                <span>•</span>
+                                                <span>{device.createdAt ? formatUpdatedAt(device.createdAt) : "No date"}</span>
                                             </div>
-                                            <StatusBadge status={device.status || "unknown"} />
                                         </div>
-                                        <div className="flex items-center gap-2 text-xs text-[#545b64] ml-8.5">
-                                            <Calendar className="w-3 h-3" />
-                                            <span>{device.createdAt ? formatUpdatedAt(device.createdAt) : "—"}</span>
+                                        <StatusBadge status={device.status || "unknown"} />
+                                    </div>
+
+                                    {/* Parameters Grid */}
+                                    {device.parameters && device.parameters.length > 0 ? (
+                                        <div className="grid grid-cols-2 gap-3 mb-5 p-3 bg-[#F5F5F7] dark:bg-[#2C2C2E] rounded-2xl">
+                                            {device.parameters.slice(0, 4).map((param: any, idx: number) => (
+                                                <div key={idx} className="flex flex-col">
+                                                    <span className="text-[10px] font-semibold text-[#86868B] dark:text-[#98989D] uppercase tracking-wide truncate">
+                                                        {param.label || param.key}
+                                                    </span>
+                                                    <span className="text-sm font-bold text-[#1D1D1F] dark:text-white font-mono truncate">
+                                                        {param.reading !== undefined && param.reading !== null
+                                                            ? `${param.reading} ${param.unit || ''}`
+                                                            : "--"}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="mb-5 p-4 bg-[#F5F5F7] dark:bg-[#2C2C2E] rounded-2xl flex items-center justify-center text-xs text-[#86868B]">
+                                            No Live Readings
+                                        </div>
+                                    )}
+
+                                    {/* Card Footer */}
+                                    <div className="flex items-center justify-between pt-4 border-t border-[#E5E5EA] dark:border-[#2C2C2E] mt-auto">
+                                        <span className="text-xs font-medium text-[#86868B]">Device Details</span>
+                                        <div className="flex items-center gap-1 text-sm font-semibold text-[#0071E3] group-hover:translate-x-1 transition-transform">
+                                            View <ChevronRight className="w-4 h-4" />
                                         </div>
                                     </div>
-                                ))}
-                            </div>
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>

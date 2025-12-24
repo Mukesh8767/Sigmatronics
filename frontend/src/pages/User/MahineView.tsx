@@ -4,7 +4,7 @@ import { useDevicesBySolution } from "../../hooks/useUserDeviceSolutions";
 import { LocationEdit, MapPin, Power, Server } from "lucide-react";
 import { Back } from "../../components/BackButton";
 
-export const MachineView = () => {
+export const MachineView1 = () => {
   const { userId, solution } = useParams();
   const navigate = useNavigate();
   const { devices, loading, error } = useDevicesBySolution(userId || "", solution || "");

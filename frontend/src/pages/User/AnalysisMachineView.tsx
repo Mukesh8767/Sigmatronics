@@ -46,7 +46,7 @@ export const AnalysisMachineView = () => {
             <th className="px-4 py-2 text-left">#</th>
             <th className="px-4 py-2 text-left">
               <div className="flex items-center gap-1">
-                <Gauge className="w-4 h-4" /> Machine ID
+                <Gauge className="w-4 h-4" />Device ID
               </div>
             </th>
             <th className="px-4 py-2 text-left">
