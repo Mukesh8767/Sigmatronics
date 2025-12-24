@@ -7,6 +7,8 @@ import {
   ChevronRight,
   ChevronLeft,
   User,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
@@ -17,6 +19,15 @@ const UserWrapper = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { userId } = useParams<{ userId: string }>();
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDark]);
 
   const navItems = [
     { label: 'Solutions', icon: ChartColumnBig, path: `/user/${userId}/solutions` },
@@ -44,7 +55,7 @@ const UserWrapper = ({ children }: { children: React.ReactNode }) => {
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
   return (
-    <div className="flex h-screen w-screen bg-[#000000] to-white text-white">
+    <div className="flex h-screen w-screen bg-black text-white">
       {!isMobile && (
         <aside
           className={`transition-all duration-300 flex flex-col justify-between
@@ -103,6 +114,13 @@ const UserWrapper = ({ children }: { children: React.ReactNode }) => {
               <LogOut size={20} />
               {!isCollapsed && <span className="text-sm">Logout</span>}
             </button>
+            <button
+              onClick={() => setIsDark(!isDark)}
+              className="flex items-center gap-3 px-3 py-2 rounded-lg text-white/60 hover:bg-white/10 hover:text-white transform hover:scale-105 transition-all duration-200"
+            >
+              {isDark ? <Sun size={20} /> : <Moon size={20} />}
+              {!isCollapsed && <span className="text-sm">{isDark ? 'Light Mode' : 'Dark Mode'}</span>}
+            </button>
           </div>
         </aside>
       )}
@@ -117,7 +135,7 @@ const UserWrapper = ({ children }: { children: React.ReactNode }) => {
             }} />
           </header>
         )}
-        <main className="flex-1 overflow-auto bg-white  ">{children}</main>
+        <main className="flex-1 overflow-auto">{children}</main>
 
         {isMobile && (
           <nav className="fixed bottom-0 left-0 right-0 z-10 bg-black border-t border-white/20 shadow-inner flex justify-around py-4">
