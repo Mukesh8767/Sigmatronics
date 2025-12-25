@@ -24,14 +24,12 @@ export const AnalysisMachineView = () => {
     const active = status === "active";
     return (
       <span
-        className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full ${
-          active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-        }`}
+        className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full ${active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+          }`}
       >
         <span
-          className={`w-1.5 h-1.5 rounded-full ${
-            active ? "bg-green-600" : "bg-red-600"
-          }`}
+          className={`w-1.5 h-1.5 rounded-full ${active ? "bg-green-600" : "bg-red-600"
+            }`}
         />
         {status}
       </span>

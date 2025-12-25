@@ -69,7 +69,7 @@ const DeviceEditModal = ({ device, onClose, onSuccess }: { device: any, onClose:
 
         setSaving(true);
         try {
-            await axiosInstance.put(`/api/device/update/${device.machineId}`, {
+            await axiosInstance.put(`/api/device/updateParameters/${device.machineId}`, {
                 parameters: parameters
             });
             toast.success("Device configuration updated");
