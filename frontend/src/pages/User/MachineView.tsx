@@ -125,16 +125,28 @@ export const MachineView = () => {
                       const param = d.parameters?.find((p) => p.label === label);
                       return (
                         <td key={label} className="px-4 py-3">
-                          {param ? `${param.reading ?? "–"} ${param.unit ?? ""}` : "–"}
+                          {param ? (
+                            <div className="flex flex-col gap-1">
+                              <span className="font-semibold text-gray-900">
+                                {param.reading ?? "–"}
+                              </span>
+                              {param.unit && (
+                                <span className="text-xs text-gray-500 font-medium">
+                                  {param.unit}
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-gray-400">–</span>
+                          )}
                         </td>
                       );
                     })}
                     <td className="px-4 py-3">
-                      <span className={`inline-block px-2 py-1 text-xs rounded-full font-semibold ${
-                        d.status === "active"
+                      <span className={`inline-block px-2 py-1 text-xs rounded-full font-semibold ${d.status === "active"
                           ? "bg-green-100 text-green-700"
                           : "bg-red-100 text-red-700"
-                      }`}>
+                        }`}>
                         {d.status}
                       </span>
                     </td>
@@ -155,7 +167,7 @@ export const MachineView = () => {
       {editDevice && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm text-black">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-hidden border border-gray-300">
-            
+
             <div className="bg-gradient-to-r from-black to-slate-700 text-white p-5 border-b">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">

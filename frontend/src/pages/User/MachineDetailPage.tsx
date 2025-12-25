@@ -69,6 +69,9 @@ export const MachineDetailPage = () => {
     const fromStr = format(from, "yyyy-MM-dd");
     const toStr = format(to, "yyyy-MM-dd");
 
+    // Clear readings when date range changes
+    setReadings([]);
+
     const fetchReadings = async (isFirstLoad = false) => {
       if (isFirstLoad) setIsInitialLoading(true);
       try {
@@ -87,7 +90,7 @@ export const MachineDetailPage = () => {
         setReadings((prev) => {
           const existing = new Set(prev.map((p) => p.timestamp));
           const newItems = transformed.filter((r: any) => !existing.has(r.timestamp));
-          if (newItems.length === 0) return prev;
+          if (newItems.length === 0 && !isFirstLoad) return prev;
           return [...prev, ...newItems].sort(
             (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
           );

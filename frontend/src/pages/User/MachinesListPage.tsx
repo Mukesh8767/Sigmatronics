@@ -17,7 +17,7 @@ import {
     AlertTriangle
 } from "lucide-react";
 import { formatUpdatedAt } from "../../components/tables/MachineOverviewTable";
-import { encodeBase64 } from "../../../utils/base64";
+import { encodeBase64, decodeBase64 } from "../../../utils/base64";
 import { transformMachineCode } from "../../components/machineCodeEncoder";
 import axiosInstance from "../../../utils/axiosInstance";
 import { toast } from "react-toastify";
@@ -221,6 +221,16 @@ export const MachinesListPage = () => {
     const activeMachines = devices.filter(d => d.status === "active").length;
     const inactiveMachines = devices.filter(d => d.status !== "active").length;
 
+    // Get all unique parameter labels across all devices
+    const allParameterLabels = Array.from(
+        new Set(
+            devices.flatMap((device) => device.parameters?.map((param: any) => param.label || param.key) || [])
+        )
+    );
+
+    // Decode solution name
+    const solutionName = solution ? decodeBase64(solution) || "Solution" : "Solution";
+
     const filteredDevices = devices.filter(d =>
         transformMachineCode(d.machineId).toLowerCase().includes(searchTerm.toLowerCase()) ||
         (d.loca && d.loca.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -251,8 +261,8 @@ export const MachinesListPage = () => {
 
                         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
                             <div>
-                                <h1 className="text-3xl font-bold tracking-tight text-[#1D1D1F] dark:text-[#F5F5F7]">Devices</h1>
-                                <p className="text-[#86868B] dark:text-[#98989D] font-medium mt-1">Monitoring systems</p>
+                                <h1 className="text-3xl font-bold tracking-tight text-[#1D1D1F] dark:text-[#F5F5F7]">{solutionName}</h1>
+                                <p className="text-[#86868B] dark:text-[#98989D] font-medium mt-1">Device monitoring and management</p>
                             </div>
 
                             {!loading && devices.length > 0 && (
@@ -317,7 +327,11 @@ export const MachinesListPage = () => {
                                         <tr>
                                             <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-[#86868B] uppercase tracking-wider">Device ID</th>
                                             <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-[#86868B] uppercase tracking-wider">Status</th>
-                                            <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-[#86868B] uppercase tracking-wider">Current Readings</th>
+                                            {allParameterLabels.map((label) => (
+                                                <th key={label} scope="col" className="px-6 py-4 text-left text-xs font-semibold text-[#86868B] uppercase tracking-wider">
+                                                    {label}
+                                                </th>
+                                            ))}
                                             <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-[#86868B] uppercase tracking-wider">Location</th>
                                             <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-[#86868B] uppercase tracking-wider">Last Activity</th>
                                             <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-[#86868B] uppercase tracking-wider">Actions</th>
@@ -344,23 +358,27 @@ export const MachinesListPage = () => {
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <StatusBadge status={device.status || "unknown"} />
                                                 </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="flex flex-wrap gap-2 max-w-md">
-                                                        {device.parameters && device.parameters.length > 0 ? (
-                                                            device.parameters.slice(0, 3).map((param: any, idx: number) => (
-                                                                <span key={idx} className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 dark:bg-[#2C2C2E] text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-[#3A3A3C]">
-                                                                    <span className="opacity-70 mr-1">{param.label || param.key}:</span>
-                                                                    <span className="font-mono">{param.reading ?? '--'} {param.unit}</span>
-                                                                </span>
-                                                            ))
-                                                        ) : (
-                                                            <span className="text-xs text-gray-400">No readings</span>
-                                                        )}
-                                                        {device.parameters && device.parameters.length > 3 && (
-                                                            <span className="text-xs text-gray-400 self-center">+{device.parameters.length - 3} more</span>
-                                                        )}
-                                                    </div>
-                                                </td>
+                                                {allParameterLabels.map((label) => {
+                                                    const param = device.parameters?.find((p: any) => (p.label || p.key) === label);
+                                                    return (
+                                                        <td key={label} className="px-6 py-4 whitespace-nowrap">
+                                                            {param ? (
+                                                                <div className="flex flex-col">
+                                                                    <span className="text-sm font-bold text-[#1D1D1F] dark:text-white font-mono">
+                                                                        {param.reading ?? '--'}
+                                                                    </span>
+                                                                    {param.unit && (
+                                                                        <span className="text-xs text-[#86868B] font-medium">
+                                                                            {param.unit}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            ) : (
+                                                                <span className="text-sm text-gray-400">--</span>
+                                                            )}
+                                                        </td>
+                                                    );
+                                                })}
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center text-sm text-[#1D1D1F] dark:text-[#E5E5EA]">
                                                         <MapPin className="flex-shrink-0 mr-1.5 h-4 w-4 text-[#86868B]" />

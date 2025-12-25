@@ -64,9 +64,11 @@ interface ReadingVisualizerProps {
 
 const CustomTooltip = ({ active, payload, label, unit }: any) => {
   if (active && payload && payload.length) {
+    // Get the full time from the payload if available
+    const fullTime = payload[0].payload?.fullTime || label;
     return (
-      <div className="bg-white/90 dark:bg-[#1C1C1E]/90 backdrop-blur-md p-3 rounded-xl shadow-lg border border-gray-100 dark:border-[#2C2C2E] text-xs">
-        <p className="font-semibold text-gray-900 dark:text-white mb-1">{label}</p>
+      <div className="bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-md p-3 rounded-xl shadow-lg border border-gray-100 dark:border-[#2C2C2E] text-xs">
+        <p className="font-semibold text-gray-900 dark:text-white mb-1">{fullTime}</p>
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full" style={{ backgroundColor: payload[0].stroke || payload[0].fill }} />
           <span className="text-gray-600 dark:text-gray-300">
@@ -83,23 +85,32 @@ const ReadingVisualizer: React.FC<ReadingVisualizerProps> = ({ data }) => {
   const [expandedChart, setExpandedChart] = useState<string | null>(null);
 
   const processedData = useMemo(() => {
-    if (!data || data.length === 0) return { parameters: [], chartData: [] };
+    if (!data || data.length === 0) return { parameters: [], chartData: [], spansMultipleDays: false };
 
     // Sort data by date ascending for charts
     const sortedData = [...data].sort(
       (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     );
 
+    // Check if data spans multiple days
+    const firstDate = format(new Date(sortedData[0].createdAt), "yyyy-MM-dd");
+    const lastDate = format(new Date(sortedData[sortedData.length - 1].createdAt), "yyyy-MM-dd");
+    const spansMultipleDays = firstDate !== lastDate;
+
     const chartData: any[] = sortedData.map((d) => ({
       ...d.reading,
       timestamp: d.createdAt,
-      displayTime: format(new Date(d.createdAt), "HH:mm"),
-      fullTime: format(new Date(d.createdAt), "MMM dd, HH:mm"),
+      // Show date + time if spanning multiple days, otherwise just time
+      displayTime: spansMultipleDays
+        ? format(new Date(d.createdAt), "MMM dd HH:mm")
+        : format(new Date(d.createdAt), "HH:mm"),
+      fullTime: format(new Date(d.createdAt), "MMM dd, yyyy HH:mm"),
     }));
 
     return {
       parameters: data[0].solution.parameters,
       chartData,
+      spansMultipleDays,
     };
   }, [data]);
 
