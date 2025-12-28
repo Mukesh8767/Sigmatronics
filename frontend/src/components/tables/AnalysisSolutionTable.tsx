@@ -43,7 +43,7 @@ export const AnalysisSolutionTable = ({ data }: SolutionTableProps) => {
   return (
     <div className="w-full max-w-6xl mx-auto">
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        
+
         {/* Header */}
         <div className="bg-gradient-to-r from-gray-50 to-blue-50/50 px-4 py-3 border-b border-gray-100">
           <div className="flex items-center justify-between">

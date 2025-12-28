@@ -23,7 +23,7 @@ export const UserMachines = () => {
           </div>
         </div>
 
-        {loading && <SolutionTableSkeleton/>}
+        {loading && <SolutionTableSkeleton />}
         {error && <p className="text-red-500">{error}</p>}
         {!loading && !error && solutions.length > 0 && (
           // @ts-ignore
@@ -33,7 +33,7 @@ export const UserMachines = () => {
           <p className="text-gray-500">No solutions found for this user.</p>
         )}
 
-        <Outlet />  
+        <Outlet />
       </div>
     </UserWrapper>
   );

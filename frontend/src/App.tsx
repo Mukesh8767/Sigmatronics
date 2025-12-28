@@ -124,7 +124,7 @@ function App() {
             } />
             <Route path='anamoly' element={
               <ProtectedRoute>
-                <Anamoly />
+                <Anamoly/>
               </ProtectedRoute>
             } />
             {/* Legacy routes - keeping for backward compatibility */}
@@ -159,7 +159,7 @@ function App() {
               }
             />
             <Route path="machines/:solution" element={<ProtectedRoute><MachinesListPage /></ProtectedRoute>} />
-            <Route path='machines/:solution/:deviceName' element={<ProtectedRoute>
+            <Route path='machines/:solution/:Name' element={<ProtectedRoute>
               <MachineDetailPage />
             </ProtectedRoute>} />
 

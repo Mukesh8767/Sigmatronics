@@ -108,6 +108,7 @@ export const MachineReadingAnalysis = () => {
     setSelectedColumns(newSelected);
   };
 
+
   const trackingCoordinates = readings
     .map((r) => r.readings?.latitude != null && r.readings?.longitude != null ? [r.readings.latitude, r.readings.longitude] as [number, number] : null)
     .filter(Boolean) as [number, number][];

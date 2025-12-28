@@ -1,35 +1,33 @@
-/* CLEAN + MOBILE OPTIMIZED VISUALIZER */
-
-import React, { useState } from "react";
-import { Line as LineChart } from "react-chartjs-2";
+import React, { useState, useMemo } from "react";
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
+  XAxis,
+  YAxis,
+  CartesianGrid,
   Tooltip,
-  Legend,
-  ArcElement,
-} from "chart.js";
-
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+} from "recharts";
 import { format } from "date-fns";
 import {
   Activity,
   MapPin,
   Gauge,
   BarChart3,
-  LineChartIcon,
+  LineChart as LineChartIcon,
   PieChart,
   Maximize2,
   Minimize2,
   Calendar,
-  Hash,
   Zap,
   CheckCircle2,
   Info,
+  TrendingUp,
+  Thermometer,
+  Droplets,
+  Wind,
 } from "lucide-react";
 
 import { MapContainer, TileLayer, Marker, Polyline, Popup } from "react-leaflet";
@@ -38,19 +36,6 @@ import "leaflet/dist/leaflet.css";
 
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
-import { formatUpdatedAt } from "./tables/MachineOverviewTable";
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement
-);
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -77,186 +62,226 @@ interface ReadingVisualizerProps {
   data: ReadingData[];
 }
 
+const CustomTooltip = ({ active, payload, label, unit }: any) => {
+  if (active && payload && payload.length) {
+    // Get the full time from the payload if available
+    const fullTime = payload[0].payload?.fullTime || label;
+    return (
+      <div className="bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-md p-3 rounded-xl shadow-lg border border-gray-100 dark:border-[#2C2C2E] text-xs">
+        <p className="font-semibold text-gray-900 dark:text-white mb-1">{fullTime}</p>
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: payload[0].stroke || payload[0].fill }} />
+          <span className="text-gray-600 dark:text-gray-300">
+            {payload[0].value.toFixed(2)} {unit}
+          </span>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
 const ReadingVisualizer: React.FC<ReadingVisualizerProps> = ({ data }) => {
   const [expandedChart, setExpandedChart] = useState<string | null>(null);
 
+  const processedData = useMemo(() => {
+    if (!data || data.length === 0) return { parameters: [], chartData: [], spansMultipleDays: false };
+
+    // Sort data by date ascending for charts
+    const sortedData = [...data].sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+
+    // Check if data spans multiple days
+    const firstDate = format(new Date(sortedData[0].createdAt), "yyyy-MM-dd");
+    const lastDate = format(new Date(sortedData[sortedData.length - 1].createdAt), "yyyy-MM-dd");
+    const spansMultipleDays = firstDate !== lastDate;
+
+    const chartData: any[] = sortedData.map((d) => ({
+      ...d.reading,
+      timestamp: d.createdAt,
+      // Show date + time if spanning multiple days, otherwise just time
+      displayTime: spansMultipleDays
+        ? format(new Date(d.createdAt), "MMM dd HH:mm")
+        : format(new Date(d.createdAt), "HH:mm"),
+      fullTime: format(new Date(d.createdAt), "MMM dd, yyyy HH:mm"),
+    }));
+
+    return {
+      parameters: data[0].solution.parameters,
+      chartData,
+      spansMultipleDays,
+    };
+  }, [data]);
+
+  const { parameters, chartData } = processedData;
+
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white border rounded-2xl p-10 text-center shadow-sm">
-        <Activity className="w-8 h-8 mx-auto mb-3 text-gray-400" />
-        <p className="text-gray-700 font-medium">No Data Available</p>
+      <div className="flex flex-col items-center justify-center p-12 bg-white dark:bg-[#1C1C1E] rounded-3xl border border-gray-200 dark:border-[#2C2C2E]">
+        <Activity className="w-10 h-10 text-gray-400 mb-4" />
+        <p className="text-gray-500 font-medium">No Data Available</p>
       </div>
     );
   }
 
-  const parameters = data[0].solution.parameters;
-  const getValues = (key: string) => data.map((d) => d.reading[key]);
-  const getLabels = () =>
-    data.map((d) =>
-      d.createdAt ? format(new Date(d.createdAt), "MMM dd, HH:mm") : ""
-    );
-
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case "line":
-        return LineChartIcon;
-      case "bar":
-        return BarChart3;
-      case "pie":
-        return PieChart;
-      case "gauge":
-        return Gauge;
-      case "geo":
-        return MapPin;
-      case "badge":
-        return CheckCircle2;
-      case "number":
-        return Hash;
-      default:
-        return Activity;
+      case "line": return LineChartIcon;
+      case "bar": return BarChart3;
+      case "pie": return PieChart;
+      case "gauge": return Gauge;
+      case "geo": return MapPin;
+      case "badge": return CheckCircle2;
+      case "number": return TrendingUp;
+      default: return Activity;
     }
   };
 
-  const generateChartData = (param: Param) => ({
-    labels: getLabels(),
-    datasets: [
-      {
-        label: `${param.label || param.key}${
-          param.unit ? ` (${param.unit})` : ""
-        }`,
-        data: getValues(param.key),
-        backgroundColor: `${param.color || "#3b82f6"}20`,
-        borderColor: param.color || "#3b82f6",
-        borderWidth: 1.8,
-        tension: 0.4,
-        pointRadius: 2,
-      },
-    ],
-  });
-
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-    },
-    scales: {
-      x: {
-        ticks: { color: "#6b7280", font: { size: 10 } },
-      },
-      y: {
-        ticks: { color: "#6b7280", font: { size: 10 } },
-      },
-    },
-  };
+  const getParamIcon = (label: string) => {
+    const l = label.toLowerCase();
+    if (l.includes('temp')) return Thermometer;
+    if (l.includes('humid') || l.includes('water')) return Droplets;
+    if (l.includes('air') || l.includes('gas')) return Wind;
+    if (l.includes('energy') || l.includes('volt')) return Zap;
+    return Activity;
+  }
 
   const DataCard = ({ param }: { param: Param }) => {
     const label = param.label || param.key;
-    const Icon = getTypeIcon(param.type);
+    const VisualTypeIcon = getTypeIcon(param.type);
+    const ParamIcon = getParamIcon(label);
+    // Actually typically [0] is latest in many APIs, but previous code sorted by time for charts. 
+    // Let's use the last item of our sorted 'chartData' as the "latest" to be consistent with charts.
+    const latestItem = chartData[chartData.length - 1];
+    const latestVal = latestItem ? latestItem[param.key] : 0;
 
-    const latestValue = getValues(param.key).slice(-1)[0];
+    const isExpanded = expandedChart === param.key;
+    const color = param.color || "#0071E3";
 
-    /* GEO */
+    const commonCardClasses = `bg-white dark:bg-[#1C1C1E] rounded-3xl p-5 border border-gray-200 dark:border-[#2C2C2E] shadow-sm transition-all duration-300 hover:shadow-md ${isExpanded ? "col-span-1 md:col-span-2 row-span-2" : ""
+      }`;
+
+    // --- MAP / GEO ---
     if (param.type === "geo") {
-      const latlngs = data
+      const latlngs = chartData
         .map((row) =>
-          row.reading.latitude && row.reading.longitude
-            ? ([row.reading.latitude, row.reading.longitude] as [
-                number,
-                number
-              ])
-            : null
+          row.latitude && row.longitude ? ([row.latitude, row.longitude] as [number, number]) : null
         )
         .filter(Boolean) as [number, number][];
 
       return (
-        <div className="bg-white rounded-2xl p-4 shadow-sm border">
-          <div className="flex items-center gap-3 mb-3">
-            <Icon className="w-5 h-5 text-blue-600" />
-            <h4 className="font-semibold text-gray-900">{label}</h4>
+        <div className={commonCardClasses}>
+          <div className="flex items-center gap-2 mb-4">
+            <div className={`p-2 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400`}>
+              <MapPin className="w-5 h-5" />
+            </div>
+            <h4 className="font-semibold text-gray-900 dark:text-white">{label}</h4>
           </div>
-
-          {latlngs.length ? (
-            <MapContainer
-              center={latlngs[0]}
-              zoom={13}
-              className="h-56 w-full rounded-xl"
-              scrollWheelZoom={false}
-            >
-              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              <Polyline positions={latlngs} color="blue" />
-              {latlngs.map((pos, i) => (
-                <Marker key={i} position={pos}>
-                  <Popup>{format(new Date(data[i].createdAt), "MMM dd, HH:mm")}</Popup>
+          <div className="h-64 rounded-2xl overflow-hidden border border-gray-100 dark:border-[#2C2C2E] relative z-0">
+            {latlngs.length ? (
+              <MapContainer center={latlngs[latlngs.length - 1]} zoom={13} className="h-full w-full" scrollWheelZoom={false}>
+                <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>' />
+                <Polyline positions={latlngs} color={color} weight={4} opacity={0.7} />
+                <Marker position={latlngs[latlngs.length - 1]}>
+                  <Popup>Latest Position: {format(new Date(latestItem.timestamp), "MMM dd, HH:mm")}</Popup>
                 </Marker>
-              ))}
-            </MapContainer>
-          ) : (
-            <p className="text-sm text-gray-500">No location data</p>
-          )}
+              </MapContainer>
+            ) : (
+              <div className="h-full flex items-center justify-center bg-gray-50 dark:bg-[#2C2C2E]">
+                <p className="text-gray-400 text-sm">No GPS data available</p>
+              </div>
+            )}
+          </div>
         </div>
       );
     }
 
-    /* BADGE */
+    // --- BADGE ---
     if (param.type === "badge") {
       return (
-        <div className="bg-white rounded-2xl p-4 shadow-sm border flex items-center justify-between">
-          <div className="text-sm">
-            <p className="font-semibold text-gray-900">{label}</p>
-            <p className="text-lg mt-1">{latestValue}</p>
+        <div className={`${commonCardClasses} flex items-center justify-between`}>
+          <div>
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">{label}</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">{latestVal}</p>
           </div>
-          <Icon className="w-6 h-6 text-green-600" />
+          <div className="w-12 h-12 rounded-full bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-green-600 dark:text-green-400">
+            <CheckCircle2 className="w-6 h-6" />
+          </div>
         </div>
       );
     }
 
-    /* NUMBER */
+    // --- NUMBER ---
     if (param.type === "number") {
       return (
-        <div className="bg-white rounded-2xl p-4 shadow-sm border">
-          <p className="font-semibold text-gray-900">{label}</p>
-          <p className="text-3xl mt-2 font-bold">
-            {latestValue}
-            {param.unit ? ` ${param.unit}` : ""}
-          </p>
-        </div>
-      );
-    }
-
-    /* GAUGE */
-    if (param.type === "gauge") {
-      const pct = Math.min(Math.max(latestValue, 0), 100);
-
-      return (
-        <div className="bg-white rounded-2xl p-4 shadow-sm border">
-          <p className="font-semibold mb-2 text-gray-900">{label}</p>
-
-          <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
-            <div
-              style={{ width: `${pct}%` }}
-              className="h-2 bg-orange-500 rounded-full"
-            />
+        <div className={commonCardClasses}>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <ParamIcon className="w-4 h-4 text-gray-400" />
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{label}</span>
+            </div>
           </div>
-          <p className="text-sm mt-2">{latestValue}%</p>
+          <div className="flex items-baseline gap-1">
+            <span className="text-3xl font-bold text-gray-900 dark:text-white">{typeof latestVal === 'number' ? latestVal.toFixed(2) : latestVal}</span>
+            {param.unit && <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{param.unit}</span>}
+          </div>
         </div>
       );
     }
 
-    /* CHARTS (simple + mobile first) */
+    // --- GAUGE ---
+    if (param.type === "gauge") {
+      const pct = Math.min(Math.max(Number(latestVal) || 0, 0), 100);
+      return (
+        <div className={commonCardClasses}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className={`p-1.5 rounded-lg bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400`}>
+                <Gauge className="w-4 h-4" />
+              </div>
+              <span className="font-semibold text-gray-900 dark:text-white">{label}</span>
+            </div>
+          </div>
+          <div className="relative pt-2">
+            <div className="flex justify-between text-xs text-gray-400 mb-1">
+              <span>0%</span>
+              <span>100%</span>
+            </div>
+            <div className="h-4 w-full bg-gray-100 dark:bg-[#2C2C2E] rounded-full overflow-hidden">
+              <div
+                style={{ width: `${pct}%` }}
+                className="h-full bg-gradient-to-r from-orange-400 to-red-500 transition-all duration-1000 ease-out rounded-full"
+              />
+            </div>
+            <div className="mt-2 text-center">
+              <span className="text-2xl font-bold text-gray-900 dark:text-white">{pct}</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">%</span>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    // --- CHARTS (Line / Bar) ---
     return (
-      <div className="bg-white rounded-2xl p-4 shadow-sm border">
-        <div className="flex justify-between items-center mb-3">
-          <div className="flex items-center gap-2">
-            <Icon className="w-5 h-5 text-blue-600" />
-            <p className="font-medium text-gray-900">{label}</p>
+      <div className={commonCardClasses}>
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400`}>
+              <VisualTypeIcon className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-900 dark:text-white leading-tight">{label}</h4>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                Latest: <span className="font-medium text-gray-700 dark:text-gray-300">{Number(latestVal)?.toFixed(2)} {param.unit}</span>
+              </p>
+            </div>
           </div>
 
           <button
-            onClick={() =>
-              setExpandedChart(expandedChart === param.key ? null : param.key)
-            }
-            className="p-1 rounded-md text-gray-600 hover:bg-gray-100"
+            onClick={() => setExpandedChart(expandedChart === param.key ? null : param.key)}
+            className="p-2 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-[#2C2C2E] hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
           >
             {expandedChart === param.key ? (
               <Minimize2 className="w-4 h-4" />
@@ -266,67 +291,116 @@ const ReadingVisualizer: React.FC<ReadingVisualizerProps> = ({ data }) => {
           </button>
         </div>
 
-        <div
-          className={`transition-all ${
-            expandedChart === param.key ? "h-64" : "h-40"
-          }`}
-        >
-          <LineChart data={generateChartData(param)} options={chartOptions} />
+        <div className={`transition-all duration-300 w-full ${expandedChart === param.key ? "h-96" : "h-48"}`}>
+          <ResponsiveContainer width="100%" height="100%">
+            {param.type === 'bar' ? (
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E5EA" opacity={0.5} />
+                <XAxis
+                  dataKey="displayTime"
+                  stroke="#86868B"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                  minTickGap={30}
+                />
+                <YAxis
+                  stroke="#86868B"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                  width={35}
+                />
+                <Tooltip content={<CustomTooltip unit={param.unit} />} cursor={{ fill: 'transparent' }} />
+                <Bar
+                  dataKey={param.key}
+                  fill={color}
+                  radius={[4, 4, 0, 0]}
+                  animationDuration={1500}
+                />
+              </BarChart>
+            ) : (
+              <AreaChart data={chartData}>
+                <defs>
+                  <linearGradient id={`gradient-${param.key}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={color} stopOpacity={0.3} />
+                    <stop offset="95%" stopColor={color} stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E5EA" opacity={0.5} />
+                <XAxis
+                  dataKey="displayTime"
+                  stroke="#86868B"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                  minTickGap={30}
+                />
+                <YAxis
+                  stroke="#86868B"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                  width={35}
+                  domain={['auto', 'auto']} // Auto scale to show variation
+                />
+                <Tooltip content={<CustomTooltip unit={param.unit} />} />
+                <Area
+                  type="monotone"
+                  dataKey={param.key}
+                  stroke={color}
+                  strokeWidth={2}
+                  fill={`url(#gradient-${param.key})`}
+                  animationDuration={1500}
+                />
+              </AreaChart>
+            )}
+          </ResponsiveContainer>
         </div>
       </div>
     );
   };
 
   return (
-    <div className="space-y-8 px-2 ">
-
-      {/* Summary Bar */}
-      <div className="bg-white rounded-2xl border shadow-sm py-4 px-6 flex items-center justify-around text-sm">
-        <span className="flex items-center gap-1">
-          <Activity className="w-4 h-4 text-blue-600" />
-          {parameters.length} Params
-        </span>
-        <span className="flex items-center gap-1">
-          <Calendar className="w-4 h-4 text-green-600" />
-          {data.length} Readings
-        </span>
-        <span className="flex items-center gap-1">
-          <Zap className="w-4 h-4 text-purple-600" />
-          Live
-        </span>
+    <div className="space-y-6">
+      {/* Summary Stats Row */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="bg-white dark:bg-[#1C1C1E] p-4 rounded-3xl border border-gray-200 dark:border-[#2C2C2E] shadow-sm flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 flex items-center justify-center">
+            <Activity className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">Params</p>
+            <p className="text-xl font-bold text-gray-900 dark:text-white">{parameters.length}</p>
+          </div>
+        </div>
+        <div className="bg-white dark:bg-[#1C1C1E] p-4 rounded-3xl border border-gray-200 dark:border-[#2C2C2E] shadow-sm flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-green-50 dark:bg-green-900/20 text-green-600 flex items-center justify-center">
+            <Calendar className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">Readings</p>
+            <p className="text-xl font-bold text-gray-900 dark:text-white">{data.length}</p>
+          </div>
+        </div>
+        <div className="bg-white dark:bg-[#1C1C1E] p-4 rounded-3xl border border-gray-200 dark:border-[#2C2C2E] shadow-sm flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-orange-50 dark:bg-orange-900/20 text-orange-600 flex items-center justify-center">
+            <Info className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">Latest</p>
+            <p className="text-sm font-bold text-gray-900 dark:text-white truncate max-w-[100px]">
+              {data.length ? format(new Date(data[0].createdAt), "HH:mm") : "-"}
+            </p>
+          </div>
+        </div>
       </div>
 
-      {/* Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Main Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {parameters.map((param) => (
           <DataCard key={param.key} param={param} />
         ))}
-      </div>
-
-      {/* Summary */}
-      <div className="bg-white rounded-2xl border shadow-sm p-6">
-        <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-          <Info className="w-5 h-5 text-blue-600" /> Summary
-        </h3>
-
-        <div className="grid grid-cols-3 text-center">
-          <div>
-            <p className="text-xl font-bold">{data.length}</p>
-            <p className="text-xs text-gray-500">Readings</p>
-          </div>
-
-          <div>
-            <p className="text-xl font-bold">{parameters.length}</p>
-            <p className="text-xs text-gray-500">Parameters</p>
-          </div>
-
-          <div>
-            <p className="text-sm font-bold">
-              {formatUpdatedAt(data[0].createdAt)}
-            </p>
-            <p className="text-xs text-gray-500">Last Updated</p>
-          </div>
-        </div>
       </div>
     </div>
   );

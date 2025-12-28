@@ -35,15 +35,15 @@ const MapComponent: React.FC<MapComponentProps> = ({ latlngs }) => {
       zoom={13}
       scrollWheelZoom={true}
       style={{
-        height: '100%', 
+        height: '100%',
         width: '100%',
         borderRadius: '12px',
         marginBottom: '2rem',
       }}
     >
       <TileLayer
-        attribution="&copy; OpenStreetMap contributors"
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
       />
       {latlngs.map((pos, idx) => (
         <Marker key={idx} position={pos} icon={markerIcon} />
