@@ -1,5 +1,5 @@
 import AdminWrapper from "../Wrappers/AdminWrapper";
-import { Plus, Trash2, Pencil, Bell, BellOff, Copy, ExternalLink } from "lucide-react";
+import { Plus, Trash2, Pencil, Bell, BellOff, Copy} from "lucide-react";
 import CreateSolutionForm from "../../components/forms/CreateSolutionForm";
 
 import { Button } from "../../components/button";

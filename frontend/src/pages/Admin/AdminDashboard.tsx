@@ -41,42 +41,14 @@ const AdminDashboard: React.FC = () => {
     return acc;
   }, {} as Record<string, number>);
 
-  const userCountMap = devices.reduce((acc, d) => {
-    acc[d.assignedTo] = (acc[d.assignedTo] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
 
-  const dateMap = devices.reduce((acc, d) => {
-    const date = d.createdAt.split("T")[0];
-    acc[date] = (acc[date] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
 
   
 
   const activeDevices = devices.filter((d) => d.status === "active").length;
   const totalSolutions = Object.keys(solutionCount).length;
 
-  const pieData = Object.entries(solutionCount).map(([name, value]) => ({
-    name,
-    value,
-    fill: "#3B82F6",
-  }));
-
-  const lineData = Object.entries(dateMap)
-    .map(([date, devices]) => ({ date, devices }))
-    .sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
-
-  const topUsers = Object.entries(userCountMap)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 3);
-
-
-  const recent = [...devices]
-    .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
-    .slice(0, 3);
+  
 
   return (
     <AdminWrapper>
