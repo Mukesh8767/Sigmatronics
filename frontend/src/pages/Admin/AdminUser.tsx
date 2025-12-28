@@ -1,4 +1,4 @@
-import AdminWrapper from "../Wrappers/AdminWrapper";
+
 import { Button } from "../../components/button";
 import { Plus } from "lucide-react";
 import { useState } from "react";
@@ -30,7 +30,7 @@ export const AdminUsers = () => {
   });
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [success] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [viewUserId, setViewUserId] = useState<string | null>(null);
