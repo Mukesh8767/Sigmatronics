@@ -250,7 +250,7 @@ const { user, loading: profileLoading, error: profileError } = useUserProfile(us
             <div className="bg-white dark:bg-[#1C1C1E] rounded-xl p-4 space-y-3">
               <h5 className="text-sm font-semibold text-[#8E8E93] uppercase tracking-wide">Assign Access</h5>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto">
-                {userMachines..filter((machine) => machine.assignedTo?.length === 1).map((machine) => (
+                {userMachines.filter((machine) => machine.assignedTo?.length === 1).map((machine) => (
                   <label key={machine.machineId} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-[#2C2C2E] cursor-pointer">
                     <input
                       type="checkbox"
