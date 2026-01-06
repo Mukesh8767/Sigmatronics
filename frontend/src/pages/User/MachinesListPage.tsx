@@ -346,12 +346,9 @@ export const MachinesListPage = () => {
                                             >
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center">
-                                                        <div className="h-10 w-10 flex-shrink-0 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center text-[#0071E3]">
-                                                            <Activity size={20} />
-                                                        </div>
+                
                                                         <div className="ml-4">
                                                             <div className="text-sm font-bold text-[#1D1D1F] dark:text-white">{transformMachineCode(device.machineId)}</div>
-                                                            <div className="text-xs text-[#86868B]">{device.machineId}</div>
                                                         </div>
                                                     </div>
                                                 </td>

@@ -117,6 +117,7 @@ export const MachineView = () => {
                     <td className="px-4 py-3">{transformMachineCode(d.machineId)}</td>
                     <td className="px-4 py-3">{d.loca || "–"}</td>
                     <td className="px-4 py-3">
+                      
                       {d.latitude !== undefined && d.longitude !== undefined
                         ? `${d.latitude}, ${d.longitude}`
                         : "–"}
