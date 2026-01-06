@@ -3,7 +3,6 @@ import {
   Home,
   LogOut,
   Monitor,
-  Users,
   Menu,
   Puzzle,
 } from "lucide-react";
@@ -21,7 +20,7 @@ const AdminWrapper = ({ children }: { children: React.ReactNode }) => {
     { label: "Home", icon: Home, path: `/admin/${adminId}/home` },
     { label: "Devices", icon: Monitor, path: `/admin/${adminId}/machines` },
     { label: "Solutions", icon: Puzzle, path: `/admin/${adminId}/solutions` },
-    { label: "Users", icon: Users, path: `/admin/${adminId}/users` },
+   
   ];
 
   const isActive = (path: string) => location.pathname.startsWith(path);

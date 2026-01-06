@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import DeviceAssignmentForm from "../../components/forms/AssignMachineForm";
+
 import MachineAssignmentTable from "../../components/tables/MachineAssignmentTable";
 import { useAllFetchRootUsers } from "../../hooks/useFetchadminUsers";
 import { useSolutions } from "../../hooks/useFetchSolutions";
 import axiosInstance from "../../../utils/axiosInstance";
 import AdminWrapper from "../Wrappers/AdminWrapper";
-import { Button } from "../../components/button";
-import { Cpu, Search } from "lucide-react";
+// import { Button } from "../../components/button";
+import {  Search } from "lucide-react";
 
 export const AdminMachine = () => {
-  const [showForm, setShowForm] = useState(false);
+  // const [showForm, setShowForm] = useState(false);
   const [selectedSolution, setSelectedSolution] = useState<string>("");
   const [machineTransactions, setMachineTransactions] = useState<any[]>([]);
   const [filteredMachines, setFilteredMachines] = useState<any[]>([]);
@@ -20,7 +20,7 @@ export const AdminMachine = () => {
 
   const pageSize = 5;
 
-  const { users, loading, error } = useAllFetchRootUsers();
+  const {  loading, error } = useAllFetchRootUsers();
   const { solutions = [] } = useSolutions();
 
   useEffect(() => {
@@ -58,12 +58,10 @@ export const AdminMachine = () => {
   return (
     <AdminWrapper>
       <div className="p-4 md:p-6">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+        {/* <div className="flex flex-col md:flex-row justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-semibold">Manage and Assign Devices</h1>
-            <p className="text-sm text-gray-500">
-              Assign devices to users and manage existing ones.
-            </p>
+            
           </div>
 
           <Button
@@ -75,9 +73,9 @@ export const AdminMachine = () => {
             <Cpu className="w-4 h-4" />
             Assign Device(s)
           </Button>
-        </div>
+        </div> */}
 
-        {showForm && (
+        {/* {showForm && (
           <div className="mt-6">
             <DeviceAssignmentForm
               users={users}
@@ -87,7 +85,7 @@ export const AdminMachine = () => {
               onRefresh={handleRefresh}
             />
           </div>
-        )}
+        )} */}
 
         <div className="mt-12">
           <label className="block text-sm font-semibold mb-2 text-gray-700">
